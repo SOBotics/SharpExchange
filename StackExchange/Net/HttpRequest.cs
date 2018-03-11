@@ -87,7 +87,18 @@ namespace StackExchange.Net
 
 			if (Cookies != null)
 			{
-				foreach (var c in Cookies.Cookies.Where(x => x.Domain == endpointUri.Host))
+				var validCookies = Cookies.Cookies.Where(x =>
+				{
+					var domain = x.Domain;
+
+					if (x.Domain.StartsWith("."))
+					{
+						domain = x.Domain.Remove(0, 1);
+					}
+
+					return endpointUri.Host.EndsWith(domain);
+				});
+				foreach (var c in validCookies)
 				{
 					request.AddCookie(c.Name, c.Value);
 				}
