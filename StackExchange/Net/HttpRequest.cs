@@ -98,6 +98,7 @@ namespace StackExchange.Net
 
 					return endpointUri.Host.EndsWith(domain);
 				});
+
 				foreach (var c in validCookies)
 				{
 					request.AddCookie(c.Name, c.Value);

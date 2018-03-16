@@ -23,7 +23,7 @@ namespace StackExchange.Auth
 
 
 
-		public IEnumerable<RestResponseCookie> GetAuthCookies(string host)
+		public IEnumerable<Cookie> GetAuthCookies(string host)
 		{
 			var fkey = FKeyAccessor.Get();
 			var endpoint = $"https://{host}/users/login";

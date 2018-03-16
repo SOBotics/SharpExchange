@@ -2,11 +2,12 @@
 using System.Collections.Generic;
 using System.Text;
 using RestSharp;
+using StackExchange.Net;
 
 namespace StackExchange
 {
 	public interface IAuthenticationProvider
 	{
-		IEnumerable<RestResponseCookie> GetAuthCookies(string host);
+		IEnumerable<Cookie> GetAuthCookies(string host);
 	}
 }

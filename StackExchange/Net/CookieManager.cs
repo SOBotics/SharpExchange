@@ -6,17 +6,17 @@ namespace StackExchange.Net
 {
 	public class CookieManager
 	{
-		private Dictionary<string, RestResponseCookie> cookies;
+		private Dictionary<string, Cookie> cookies;
 
-		public RestResponseCookie this[string name] => cookies[name];
+		public Cookie this[string name] => cookies[name];
 
-		public RestResponseCookie[] Cookies => cookies.Values.ToArray();
+		public Cookie[] Cookies => cookies.Values.ToArray();
 
 
 
 		public CookieManager()
 		{
-			cookies = new Dictionary<string, RestResponseCookie>();
+			cookies = new Dictionary<string, Cookie>();
 		}
 
 
@@ -31,7 +31,26 @@ namespace StackExchange.Net
 
 		public void Add(RestResponseCookie cookie)
 		{
-			if (cookies.ContainsKey(cookie.Name) && (cookie.Expired || cookie.Discard))
+			Add(new Cookie
+			{
+				Name = cookie.Name,
+				Value = cookie.Value,
+				Domain = cookie.Domain,
+				Expires = cookie.Expires
+			});
+		}
+
+		public void Add(IEnumerable<Cookie> cookies)
+		{
+			foreach (var cookie in cookies)
+			{
+				Add(cookie);
+			}
+		}
+
+		public void Add(Cookie cookie)
+		{
+			if (cookies.ContainsKey(cookie.Name) && cookie.Expired)
 			{
 				cookies.Remove(cookie.Name);
 			}

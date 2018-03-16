@@ -9,8 +9,6 @@ namespace StackExchange.Auth
 	{
 		private const string stackExchangeLogin = "http://stackexchange.com/users/login";
 
-
-
 		public static string Get() => Get(stackExchangeLogin);
 
 		public static string Get(string url)
