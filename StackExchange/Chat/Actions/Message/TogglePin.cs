@@ -4,7 +4,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class Pin : ChatAction
+	public class TogglePin : ChatAction
 	{
 		private readonly int messageId;
 
@@ -20,7 +20,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public Pin(int messageId)
+		public TogglePin(int messageId)
 		{
 			this.messageId = messageId;
 		}
