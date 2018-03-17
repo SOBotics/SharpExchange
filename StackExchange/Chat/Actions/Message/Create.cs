@@ -1,17 +1,11 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
+﻿using System.Collections.Generic;
 using System.Net;
-using System.Text;
-using System.Threading.Tasks;
 using Newtonsoft.Json;
-using Newtonsoft.Json.Linq;
 using RestSharp;
-using StackExchange.Net;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class CreateNew : ChatAction
+	public class Create : ChatAction
 	{
 		internal override Method RequestMethod => Method.POST;
 
@@ -25,7 +19,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public CreateNew(string text)
+		public Create(string text)
 		{
 			Data = new Dictionary<string, object>
 			{
