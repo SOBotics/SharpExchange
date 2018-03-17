@@ -12,7 +12,7 @@ namespace StackExchange.Chat.Actions.Message
 	{
 		internal override Method RequestMethod => Method.POST;
 
-		internal override string Endpoint => $"http://{Host}/chats/{RoomId}/messages/new";
+		internal override string Endpoint => $"https://{Host}/chats/{RoomId}/messages/new";
 
 		internal override bool RequiresFKey => true;
 

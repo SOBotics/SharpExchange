@@ -16,6 +16,12 @@ namespace StackExchange.Net
 
 		public string Endpoint { get; set; }
 
+		//TODO: Probably don't need this.
+		public string Origin { get; set; }
+
+		//TODO: Probably don't need this.
+		public string Referrer { get; set; }
+
 		public CookieManager Cookies { get; set; }
 
 		public Dictionary<string, object> Data { get; set; }
@@ -80,10 +86,21 @@ namespace StackExchange.Net
 
 			var client = new RestClient(baseUrl)
 			{
-				FollowRedirects = false
+				FollowRedirects = false,
+				//Proxy = new WebProxy("127.0.0.1", 8888) // Temp for fiddler
 			};
 
 			var request = new RestRequest(endpointUri.PathAndQuery, Verb);
+
+			if (!string.IsNullOrEmpty(Origin))
+			{
+				request.AddHeader("Origin", Origin);
+			}
+
+			if (!string.IsNullOrEmpty(Referrer))
+			{
+				request.AddHeader("Referer", Referrer);
+			}
 
 			if (Cookies != null)
 			{
@@ -94,6 +111,13 @@ namespace StackExchange.Net
 					if (x.Domain.StartsWith("."))
 					{
 						domain = x.Domain.Remove(0, 1);
+					}
+
+					// chat.meta.se chatusr cookie also works with chat.se rooms.
+					if (x.Name.Contains("charusr") &&
+						x.Domain == "chat.meta.stackexchange.com")
+					{
+						domain = domain.Replace("meta.", "");
 					}
 
 					return endpointUri.Host.EndsWith(domain);

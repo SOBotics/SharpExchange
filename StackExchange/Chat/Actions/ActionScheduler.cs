@@ -107,7 +107,7 @@ namespace StackExchange.Chat.Actions
 
 		public object ScheduleAction(ChatAction act) => ScheduleAction(act, Timeout.InfiniteTimeSpan);
 
-		// Perform permissions check before scheduling action for execution.
+		//TODO: Perform permissions check before scheduling action for execution.
 		public object ScheduleAction(ChatAction act, TimeSpan timeout)
 		{
 			if (act == null)
@@ -158,6 +158,8 @@ namespace StackExchange.Chat.Actions
 
 		private HttpRequest GetRequest(ChatAction act)
 		{
+			var roomUrl = $"https://{Host}/rooms/{RoomId}";
+			var orgin = $"https://{Host}";
 			var data = act.Data;
 			var cm = new CookieManager();
 
@@ -167,12 +169,12 @@ namespace StackExchange.Chat.Actions
 				{
 					data = new Dictionary<string, object>
 					{
-						["fkey"] = FKeyAccessor.Get()
+						["fkey"] = FKeyAccessor.Get(roomUrl)
 					};
 				}
 				else
 				{
-					data["fkey"] = FKeyAccessor.Get();
+					data["fkey"] = FKeyAccessor.Get(roomUrl);
 				}
 			}
 
@@ -185,6 +187,8 @@ namespace StackExchange.Chat.Actions
 			{
 				Verb = act.RequestMethod,
 				Endpoint = act.Endpoint,
+				Origin = orgin,
+				Referrer = roomUrl,
 				Cookies = cm,
 				Data = data
 			};

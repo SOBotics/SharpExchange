@@ -16,7 +16,7 @@ namespace StackExchange.Auth
 
 		public EmailAuthenticationProvider(string email, string password)
 		{
-			authCookieNames = new List<string> { "prov", "uauth", "acct" };
+			authCookieNames = new List<string> { "prov", "acct" };
 			this.email = email;
 			this.password = password;
 		}
@@ -25,15 +25,22 @@ namespace StackExchange.Auth
 
 		public IEnumerable<Cookie> GetAuthCookies(string host, bool includeChatCookie = false)
 		{
+			//TODO: Temporary until SE stop using openid to
+			// authenticate email/pwd logins.
+			if (host == "stackexchange.com")
+			{
+				host = "meta." + host;
+			}
+
 			var fkey = FKeyAccessor.Get();
 			var endpoint = $"https://{host}/users/login";
-			var cookies = new CookieManager();
+			var cMan = new CookieManager();
 
 			var response = new HttpRequest
 			{
 				Verb = Method.POST,
 				Endpoint = endpoint,
-				Cookies = cookies,
+				Cookies = cMan,
 				Data = new Dictionary<string, object>
 				{
 					["fkey"] = fkey,
@@ -42,20 +49,24 @@ namespace StackExchange.Auth
 				}
 			}.Send();
 
-			if (cookies.Cookies.Where(x => authCookieNames.Contains(x.Name)).Count() != 3)
+			var cookieCount = cMan.Cookies.Count(x => authCookieNames.Contains(x.Name));
+
+			if (cookieCount != authCookieNames.Count)
 			{
 				throw new InvalidCredentialsException();
 			}
 
-			var allCookies = cookies.Cookies.ToList();
+			var authCookies = cMan.Cookies
+				.Where(x => authCookieNames.Contains(x.Name))
+				.ToList();
 
 			if (includeChatCookie)
 			{
-				var chatCookie = GetChatCookie(host, cookies);
-				allCookies.Add(chatCookie);
+				var chatCookie = GetChatCookie(host, cMan);
+				authCookies.Add(chatCookie);
 			}
 
-			return allCookies;
+			return authCookies;
 		}
 
 
