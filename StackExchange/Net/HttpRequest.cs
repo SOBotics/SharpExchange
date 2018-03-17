@@ -16,12 +16,6 @@ namespace StackExchange.Net
 
 		public string Endpoint { get; set; }
 
-		//TODO: Probably don't need this.
-		public string Origin { get; set; }
-
-		//TODO: Probably don't need this.
-		public string Referrer { get; set; }
-
 		public CookieManager Cookies { get; set; }
 
 		public Dictionary<string, object> Data { get; set; }
@@ -91,16 +85,6 @@ namespace StackExchange.Net
 			};
 
 			var request = new RestRequest(endpointUri.PathAndQuery, Verb);
-
-			if (!string.IsNullOrEmpty(Origin))
-			{
-				request.AddHeader("Origin", Origin);
-			}
-
-			if (!string.IsNullOrEmpty(Referrer))
-			{
-				request.AddHeader("Referer", Referrer);
-			}
 
 			if (Cookies != null)
 			{

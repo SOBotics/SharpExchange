@@ -21,7 +21,7 @@ namespace StackExchange.Chat.Actions
 
 		public int RoomId { get; private set; }
 
-		public List<Cookie> AuthCookies { get; private set; }
+		public CookieManager AuthCookies { get; private set; }
 
 
 
@@ -46,7 +46,7 @@ namespace StackExchange.Chat.Actions
 
 			Host = host;
 			RoomId = id;
-			AuthCookies = new List<Cookie>(authenticationCookies);
+			AuthCookies = new CookieManager(authenticationCookies);
 
 			queueMre = new ManualResetEvent(false);
 			actionQueue = new Queue<ChatAction>();
@@ -78,7 +78,7 @@ namespace StackExchange.Chat.Actions
 
 			Host = host;
 			RoomId = roomId;
-			AuthCookies = new List<Cookie>(authenticationCookies);
+			AuthCookies = new CookieManager(authenticationCookies);
 
 			queueMre = new ManualResetEvent(false);
 			actionQueue = new Queue<ChatAction>();
@@ -158,40 +158,38 @@ namespace StackExchange.Chat.Actions
 
 		private HttpRequest GetRequest(ChatAction act)
 		{
-			var roomUrl = $"https://{Host}/rooms/{RoomId}";
-			var orgin = $"https://{Host}";
 			var data = act.Data;
-			var cm = new CookieManager();
 
 			if (act.RequiresFKey)
 			{
+				var roomUrl = $"https://{Host}/rooms/{RoomId}";
+
 				if (data == null)
 				{
 					data = new Dictionary<string, object>
 					{
-						["fkey"] = FKeyAccessor.Get(roomUrl)
+						["fkey"] = FKeyAccessor.Get(roomUrl, AuthCookies)
 					};
 				}
 				else
 				{
-					data["fkey"] = FKeyAccessor.Get(roomUrl);
+					data["fkey"] = FKeyAccessor.Get(roomUrl, AuthCookies);
 				}
 			}
 
-			if (act.RequiresAuthCookies)
-			{
-				cm.Add(AuthCookies);
-			}
-
-			return new HttpRequest
+			var req = new HttpRequest
 			{
 				Verb = act.RequestMethod,
 				Endpoint = act.Endpoint,
-				Origin = orgin,
-				Referrer = roomUrl,
-				Cookies = cm,
 				Data = data
 			};
+
+			if (act.RequiresAuthCookies)
+			{
+				req.Cookies = AuthCookies;
+			}
+
+			return req;
 		}
 
 		private string GetResponse(ChatAction act)

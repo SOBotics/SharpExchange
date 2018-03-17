@@ -12,9 +12,9 @@ namespace StackExchange.Auth
 
 		public static string Get() => Get(stackExchangeLogin);
 
-		public static string Get(string url)
+		public static string Get(string url,  CookieManager cMan = null)
 		{
-			var html = HttpRequest.Get(url);
+			var html = HttpRequest.Get(url, cMan);
 			var dom = new HtmlParser().Parse(html);
 
 			return Get(dom);

@@ -19,6 +19,11 @@ namespace StackExchange.Net
 			cookies = new Dictionary<string, Cookie>();
 		}
 
+		public CookieManager(IEnumerable<Cookie> cookies)
+		{
+			this.cookies = cookies.ToDictionary(x => x.Name, x => x);
+		}
+
 
 
 		public void Add(IEnumerable<RestResponseCookie> cookies)
@@ -50,9 +55,17 @@ namespace StackExchange.Net
 
 		public void Add(Cookie cookie)
 		{
-			if (cookies.ContainsKey(cookie.Name) && cookie.Expired)
+			if (cookies.ContainsKey(cookie.Name))
 			{
-				cookies.Remove(cookie.Name);
+				if (cookie.Expired)
+				{
+					cookies.Remove(cookie.Name);
+				}
+				else
+				{
+					cookies[cookie.Name].Value = cookie.Value;
+					cookies[cookie.Name].Expires = cookie.Expires;
+				}
 			}
 			else
 			{

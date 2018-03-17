@@ -35,7 +35,7 @@ namespace StackExchange.Auth
 
 
 
-		public IEnumerable<Cookie> GetAuthCookies(string host, bool includeChatCookie = false)
+		public IEnumerable<Cookie> GetAuthCookies(string host)
 		{
 			//TODO: Temporary until SE stop using openid to
 			// authenticate email/pwd logins.
@@ -70,52 +70,7 @@ namespace StackExchange.Auth
 				throw new InvalidCredentialsException();
 			}
 
-			if (includeChatCookie)
-			{
-				var chatCookie = GetChatCookie(host, cMan);
-				authCookies.Add(chatCookie);
-			}
-
 			return authCookies;
-		}
-
-
-
-		private Cookie GetChatCookie(string host, CookieManager cookies)
-		{
-			var endpoint = "https://chat.{0}/faq";
-
-			// If we're on any of the sites in chatusrCookieHosts,
-			// fetch the chatusr cookie. Otherwise, we'll need to
-			// get the sechatusr cookie instead.
-			if (chatusrCookieHosts.Contains(host))
-			{
-				endpoint = string.Format(endpoint, host);
-			}
-			else
-			{
-				endpoint = string.Format(endpoint, "stackexchange.com");
-			}
-
-			var cookiesCopy = new CookieManager();
-			cookiesCopy.Add(cookies.Cookies.ToArray());
-
-			var response = new HttpRequest
-			{
-				Verb = Method.GET,
-				Endpoint = endpoint,
-				Cookies = cookiesCopy
-			}.Send();
-
-			var chatCookie = cookiesCopy.Cookies
-				.SingleOrDefault(x => x.Name.Contains("chatusr"));
-
-			if (chatCookie == null)
-			{
-				throw new Exception("Unable to get chat cookie.");
-			}
-
-			return chatCookie;
 		}
 	}
 }
