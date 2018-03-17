@@ -39,16 +39,26 @@ namespace StackExchange.Net
 
 
 
-		public static string Get(string endpoint)
+		public static string GetWithStatus(string endpoint, out HttpStatusCode status)
 		{
-			return new HttpRequest
-			{
-				Verb = Method.GET,
-				Endpoint = endpoint
-			}.Send().Content;
+			return GetWithStatus(endpoint, null, out status);
 		}
 
-		public static string Get(string endpoint, CookieManager cookies)
+		public static string GetWithStatus(string endpoint, CookieManager cMan, out HttpStatusCode status)
+		{
+			var response = new HttpRequest
+			{
+				Verb = Method.GET,
+				Endpoint = endpoint,
+				Cookies = cMan
+			}.Send();
+
+			status = response.StatusCode;
+
+			return response.Content;
+		}
+
+		public static string Get(string endpoint, CookieManager cookies = null)
 		{
 			return new HttpRequest
 			{
