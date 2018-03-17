@@ -9,6 +9,7 @@ namespace StackExchange.Auth
 	public class EmailAuthenticationProvider : IAuthenticationProvider
 	{
 		private readonly List<string> authCookieNames;
+		private readonly List<string> chatusrCookieHosts;
 		private readonly string email;
 		private readonly string password;
 
@@ -16,7 +17,18 @@ namespace StackExchange.Auth
 
 		public EmailAuthenticationProvider(string email, string password)
 		{
-			authCookieNames = new List<string> { "prov", "acct" };
+			authCookieNames = new List<string>
+			{
+				"prov",
+				"acct"
+			};
+
+			chatusrCookieHosts = new List<string>
+			{
+				"stackoverflow.com",
+				"meta.stackexchange.com"
+			};
+
 			this.email = email;
 			this.password = password;
 		}
@@ -49,16 +61,14 @@ namespace StackExchange.Auth
 				}
 			}.Send();
 
-			var cookieCount = cMan.Cookies.Count(x => authCookieNames.Contains(x.Name));
-
-			if (cookieCount != authCookieNames.Count)
-			{
-				throw new InvalidCredentialsException();
-			}
-
 			var authCookies = cMan.Cookies
 				.Where(x => authCookieNames.Contains(x.Name))
 				.ToList();
+
+			if (authCookies.Count != authCookieNames.Count)
+			{
+				throw new InvalidCredentialsException();
+			}
 
 			if (includeChatCookie)
 			{
@@ -73,15 +83,18 @@ namespace StackExchange.Auth
 
 		private Cookie GetChatCookie(string host, CookieManager cookies)
 		{
-			var endpoint = "https://chat.{0}.com/faq";
+			var endpoint = "https://chat.{0}/faq";
 
-			if (host == "stackoverflow.com")
+			// If we're on any of the sites in chatusrCookieHosts,
+			// fetch the chatusr cookie. Otherwise, we'll need to
+			// get the sechatusr cookie instead.
+			if (chatusrCookieHosts.Contains(host))
 			{
-				endpoint = string.Format(endpoint, "stackoverflow");
+				endpoint = string.Format(endpoint, host);
 			}
 			else
 			{
-				endpoint = string.Format(endpoint, "stackexchange");
+				endpoint = string.Format(endpoint, "stackexchange.com");
 			}
 
 			var cookiesCopy = new CookieManager();
@@ -94,7 +107,8 @@ namespace StackExchange.Auth
 				Cookies = cookiesCopy
 			}.Send();
 
-			var chatCookie = cookiesCopy.Cookies.SingleOrDefault(x => x.Name.Contains("chatusr"));
+			var chatCookie = cookiesCopy.Cookies
+				.SingleOrDefault(x => x.Name.Contains("chatusr"));
 
 			if (chatCookie == null)
 			{
