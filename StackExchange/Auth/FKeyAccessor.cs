@@ -7,6 +7,7 @@ namespace StackExchange.Auth
 {
 	public static class FKeyAccessor
 	{
+		// All sites appear to use the same fkey value, except for chat.
 		private const string stackExchangeLogin = "http://stackexchange.com/users/login";
 
 		public static string Get() => Get(stackExchangeLogin);

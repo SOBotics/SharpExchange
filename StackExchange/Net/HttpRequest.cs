@@ -113,13 +113,6 @@ namespace StackExchange.Net
 						domain = x.Domain.Remove(0, 1);
 					}
 
-					// chat.meta.se chatusr cookie also works with chat.se rooms.
-					if (x.Name.Contains("charusr") &&
-						x.Domain == "chat.meta.stackexchange.com")
-					{
-						domain = domain.Replace("meta.", "");
-					}
-
 					return endpointUri.Host.EndsWith(domain);
 				});
 
