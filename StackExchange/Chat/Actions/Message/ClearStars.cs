@@ -30,7 +30,7 @@ namespace StackExchange.Chat.Actions.Message
 		internal override object ProcessResponse(HttpStatusCode status, string response)
 		{
 			return status == HttpStatusCode.OK &&
-				response.ToUpperInvariant() == "\"OK\"";
+				response?.ToUpperInvariant() == "\"OK\"";
 		}
 	}
 }

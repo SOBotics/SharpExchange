@@ -1,8 +1,9 @@
 ﻿using System.Collections.Generic;
 using System.Net;
+using Newtonsoft.Json;
 using RestSharp;
 
-namespace StackExchange.Chat.Actions.Message
+namespace StackExchange.Chat.Actions.User
 {
 	public class KickMute : ChatAction
 	{
@@ -28,12 +29,18 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		internal override object ProcessResponse(HttpStatusCode status, string response)
+		internal override object ProcessResponse(HttpStatusCode status, string json)
 		{
-			//TODO: Has yet to successfully pass testing. All attempts have so far failed with a 500 error.
-			//TODO: should probably deserialise response if status == ok.
-			return status == HttpStatusCode.OK &&
-				response.ToUpperInvariant().Contains("HAS BEEN KICKED");
+			if (status != HttpStatusCode.OK)
+			{
+				return false;
+			}
+
+			var typeDef = new { message = "" };
+			var data = JsonConvert.DeserializeAnonymousType(json, typeDef);
+			var msg = data?.message?.ToUpperInvariant() ?? "";
+
+			return msg.StartsWith("THE USER HAS NEEB KICKED AND CANNOT RETURN");
 		}
 	}
 }

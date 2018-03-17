@@ -2,15 +2,13 @@
 using System.Net;
 using RestSharp;
 
-namespace StackExchange.Chat.Actions.Message
+namespace StackExchange.Chat.Actions.Room
 {
-	public class TogglePin : ChatAction
+	public class Timeout : ChatAction
 	{
-		private readonly int messageId;
-
 		internal override Method RequestMethod => Method.POST;
 
-		internal override string Endpoint => $"https://{Host}/messages/{messageId}/owner-star";
+		internal override string Endpoint => $"https://{Host}/rooms/timeout/{RoomId}";
 
 		internal override bool RequiresFKey => true;
 
@@ -20,9 +18,13 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public TogglePin(int messageId)
+		public Timeout(int durationSeconds, string reason)
 		{
-			this.messageId = messageId;
+			Data = new Dictionary<string, object>
+			{
+				["duration"] = durationSeconds,
+				["reason"] = reason
+			};
 		}
 
 
@@ -30,7 +32,7 @@ namespace StackExchange.Chat.Actions.Message
 		internal override object ProcessResponse(HttpStatusCode status, string response)
 		{
 			return status == HttpStatusCode.OK &&
-				response?.ToUpperInvariant() == "\"OK\"";
+				response?.ToUpperInvariant() == "TIMEOUT APPLIED";
 		}
 	}
 }

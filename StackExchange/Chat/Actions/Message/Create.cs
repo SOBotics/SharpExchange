@@ -38,8 +38,9 @@ namespace StackExchange.Chat.Actions.Message
 
 			var typeDef = new { id = 0, time = 0 };
 			var data = JsonConvert.DeserializeAnonymousType(json, typeDef);
+			var id = data?.id ?? -1;
 
-			return data.id;
+			return id;
 		}
 	}
 }
