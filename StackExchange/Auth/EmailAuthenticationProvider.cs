@@ -23,7 +23,7 @@ namespace StackExchange.Auth
 
 
 
-		public IEnumerable<Cookie> GetAuthCookies(string host)
+		public IEnumerable<Cookie> GetAuthCookies(string host, bool includeChatCookie = false)
 		{
 			var fkey = FKeyAccessor.Get();
 			var endpoint = $"https://{host}/users/login";
@@ -33,20 +33,64 @@ namespace StackExchange.Auth
 			{
 				Verb = Method.POST,
 				Endpoint = endpoint,
-				Cookies = cookies
-			}.Send(new
-			{
-				fkey = fkey,
-				email = email,
-				password = password
-			});
+				Cookies = cookies,
+				Data = new Dictionary<string, object>
+				{
+					["fkey"] = fkey,
+					["email"] = email,
+					["password"] = password
+				}
+			}.Send();
 
 			if (cookies.Cookies.Where(x => authCookieNames.Contains(x.Name)).Count() != 3)
 			{
 				throw new InvalidCredentialsException();
 			}
 
-			return cookies.Cookies;
+			var allCookies = cookies.Cookies.ToList();
+
+			if (includeChatCookie)
+			{
+				var chatCookie = GetChatCookie(host, cookies);
+				allCookies.Add(chatCookie);
+			}
+
+			return allCookies;
+		}
+
+
+
+		private Cookie GetChatCookie(string host, CookieManager cookies)
+		{
+			var endpoint = "https://chat.{0}.com/faq";
+
+			if (host == "stackoverflow.com")
+			{
+				endpoint = string.Format(endpoint, "stackoverflow");
+			}
+			else
+			{
+				endpoint = string.Format(endpoint, "stackexchange");
+			}
+
+			var cookiesCopy = new CookieManager();
+			cookiesCopy.Add(cookies.Cookies.ToArray());
+
+			var response = new HttpRequest
+			{
+				Verb = Method.GET,
+				Endpoint = endpoint,
+				Cookies = cookiesCopy
+			}.Send();
+
+			var chatCookie = cookiesCopy.Cookies.SingleOrDefault(x => x.Name.Contains("chatusr"));
+
+			if (chatCookie == null)
+			{
+				throw new Exception("Unable to get chat cookie.");
+			}
+
+			return chatCookie;
 		}
 	}
 }

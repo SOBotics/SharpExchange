@@ -18,6 +18,8 @@ namespace StackExchange.Net
 
 		public CookieManager Cookies { get; set; }
 
+		public Dictionary<string, object> Data { get; set; }
+
 
 
 		public HttpRequest()
@@ -56,9 +58,7 @@ namespace StackExchange.Net
 			}.Send().Content;
 		}
 
-		public RestResponse Send() => Send(null);
-
-		public RestResponse Send(object data)
+		public RestResponse Send()
 		{
 			if (!supportedMethods.Contains(Verb))
 			{
@@ -67,7 +67,7 @@ namespace StackExchange.Net
 
 			if ((!Endpoint?.StartsWith("http")) ?? true)
 			{
-				throw new InvalidEndpointException($"The endpoint '{Endpoint}' is not valid.");
+				throw new InvalidEndpointException($"The endpoint '{Endpoint}' is not valId.");
 			}
 
 			if (sent)
@@ -87,7 +87,7 @@ namespace StackExchange.Net
 
 			if (Cookies != null)
 			{
-				var validCookies = Cookies.Cookies.Where(x =>
+				var valIdCookies = Cookies.Cookies.Where(x =>
 				{
 					var domain = x.Domain;
 
@@ -99,15 +99,18 @@ namespace StackExchange.Net
 					return endpointUri.Host.EndsWith(domain);
 				});
 
-				foreach (var c in validCookies)
+				foreach (var c in valIdCookies)
 				{
 					request.AddCookie(c.Name, c.Value);
 				}
 			}
 
-			if (data != null)
+			if (Data != null)
 			{
-				request.AddObject(data);
+				foreach (var k in Data.Keys)
+				{
+					request.AddParameter(k, Data[k]);
+				}
 			}
 
 			var response = (RestResponse)client.Execute(request);

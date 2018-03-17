@@ -8,6 +8,6 @@ namespace StackExchange
 {
 	public interface IAuthenticationProvider
 	{
-		IEnumerable<Cookie> GetAuthCookies(string host);
+		IEnumerable<Cookie> GetAuthCookies(string host, bool includeChatCookie = false);
 	}
 }
