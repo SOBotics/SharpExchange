@@ -1,8 +1,11 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using StackExchange.Net;
 
@@ -32,10 +35,17 @@ namespace StackExchange.Chat.Actions.Message
 
 		
 
-		internal override object ProcessResponse(string response)
+		internal override object ProcessResponse(HttpStatusCode status, string json)
 		{
-			//TODO: Finish this off.
-			return -1;
+			if (status != HttpStatusCode.OK)
+			{
+				return -1;
+			}
+
+			var typeDef = new { id = 0, time = 0 };
+			var data = JsonConvert.DeserializeAnonymousType(json, typeDef);
+
+			return data.id;
 		}
 	}
 }

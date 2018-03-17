@@ -150,7 +150,7 @@ namespace StackExchange.Chat.Actions
 				act.RoomId = RoomId;
 
 				var response = GetResponse(act);
-				var data = act.ProcessResponse(response);
+				var data = act.ProcessResponse(response.StatusCode, response.Content);
 
 				act.CallBack?.Invoke(data);
 			}
@@ -192,7 +192,7 @@ namespace StackExchange.Chat.Actions
 			return req;
 		}
 
-		private string GetResponse(ChatAction act)
+		private RestResponse GetResponse(ChatAction act)
 		{
 			RestResponse response = null;
 
@@ -221,7 +221,7 @@ namespace StackExchange.Chat.Actions
 				}
 			}
 
-			return response?.Content;
+			return response;
 		}
 	}
 }

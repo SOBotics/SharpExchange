@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Text;
 using RestSharp;
 using StackExchange.Auth;
@@ -30,6 +31,6 @@ namespace StackExchange.Chat.Actions
 
 
 
-		internal abstract object ProcessResponse(string response);
+		internal abstract object ProcessResponse(HttpStatusCode status, string response);
 	}
 }
