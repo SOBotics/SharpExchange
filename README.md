@@ -1,3 +1,4 @@
 # StackExchange
 
-A .NET API for interacting with Stack Exchange. 
+A library for interacting with Stack Exchange chat, and the API. Targeting .NET Standard 2.0.
+ 
