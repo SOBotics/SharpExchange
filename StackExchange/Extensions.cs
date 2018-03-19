@@ -7,7 +7,7 @@ namespace StackExchange
 {
 	internal static class Extensions
 	{
-		public static void GetHostAndId(this string roomUrl, out string host, out int id)
+		public static void GetHostAndIdFromRoomUrl(this string roomUrl, out string host, out int id)
 		{
 			if (string.IsNullOrEmpty(roomUrl))
 			{

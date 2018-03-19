@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using RestSharp;
@@ -42,7 +40,7 @@ namespace StackExchange.Chat.Actions
 				throw new ArgumentException($"'{nameof(authenticationCookies)}' cannot be empty.", nameof(authenticationCookies));
 			}
 
-			roomUrl.GetHostAndId(out var host, out var id);
+			roomUrl.GetHostAndIdFromRoomUrl(out var host, out var id);
 
 			Host = host;
 			RoomId = id;
