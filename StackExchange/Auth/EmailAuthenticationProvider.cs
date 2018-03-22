@@ -9,7 +9,6 @@ namespace StackExchange.Auth
 	public class EmailAuthenticationProvider : IAuthenticationProvider
 	{
 		private readonly List<string> authCookieNames;
-		private readonly List<string> chatusrCookieHosts;
 		private readonly string email;
 		private readonly string password;
 
@@ -21,12 +20,6 @@ namespace StackExchange.Auth
 			{
 				"prov",
 				"acct"
-			};
-
-			chatusrCookieHosts = new List<string>
-			{
-				"stackoverflow.com",
-				"meta.stackexchange.com"
 			};
 
 			this.email = email;
