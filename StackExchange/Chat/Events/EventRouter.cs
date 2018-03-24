@@ -12,30 +12,28 @@ namespace StackExchange.Chat.Events
 
 		public IWebSocket WebSocket { get; private set; }
 
-		public List<ChatEvent> Events { get; private set; }
+		public List<IChatEventDataProcessor> EventProcessors { get; private set; }
 
 
 
 		public EventRouter()
 		{
 			//WebSocket = ??? get default websocket implementation
-			Events = GetAllStandardEvents();
+			EventProcessors = new List<IChatEventDataProcessor>();
 		}
 
-		public EventRouter(IEnumerable<ChatEvent> events)
-		{
-			Events = new List<ChatEvent>(events);
-		}
-
-		public EventRouter(IWebSocket webSocket)
+		public EventRouter(IWebSocket webSocket, IEnumerable<IChatEventDataProcessor> eventProcessors = null)
 		{
 			WebSocket = webSocket;
-		}
 
-		public EventRouter(IWebSocket webSocket, IEnumerable<ChatEvent> events)
-		{
-			WebSocket = webSocket;
-			Events = new List<ChatEvent>(events);
+			if (eventProcessors == null)
+			{
+				EventProcessors = new List<IChatEventDataProcessor>();
+			}
+			else
+			{
+				EventProcessors = new List<IChatEventDataProcessor>(eventProcessors);
+			}
 		}
 
 		~EventRouter()
@@ -45,23 +43,12 @@ namespace StackExchange.Chat.Events
 
 
 
-		public static List<ChatEvent> GetAllStandardEvents() =>
-			typeof(EventRouter).Assembly
-				.GetTypes()
-				.Where(x => x.IsClass)
-				.Where(x => x.IsPublic)
-				.Where(x => !x.IsAbstract)
-				.Where(x => x.IsSubclassOf(typeof(ChatEvent)))
-				.Select(Activator.CreateInstance)
-				.Cast<ChatEvent>()
-				.ToList();
-
 		public void Dispose()
 		{
 			if (dispose) return;
 			dispose = true;
 
-			Events?.Clear();
+			EventProcessors?.Clear();
 			WebSocket?.Dispose();
 
 			GC.SuppressFinalize(this);

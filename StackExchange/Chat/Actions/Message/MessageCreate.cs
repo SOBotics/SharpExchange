@@ -3,44 +3,44 @@ using System.Net;
 using Newtonsoft.Json;
 using RestSharp;
 
-namespace StackExchange.Chat.Actions.User
+namespace StackExchange.Chat.Actions.Message
 {
-	public class KickMute : ChatAction
+	public class MessageCreate : ChatAction
 	{
 		internal override Method RequestMethod => Method.POST;
 
-		internal override string Endpoint => $"https://{Host}/rooms/kickmute/{RoomId}";
+		internal override string Endpoint => $"https://{Host}/chats/{RoomId}/messages/new";
 
 		internal override bool RequiresFKey => true;
 
 		internal override bool RequiresAuthCookies => true;
 
-		internal override ActionPermissionLevel RequiredPermissionLevel => ActionPermissionLevel.RoomOwner;
+		internal override ActionPermissionLevel RequiredPermissionLevel => ActionPermissionLevel.Anyone;
 
 
 
-		public KickMute(int userId)
+		public MessageCreate(string text)
 		{
 			Data = new Dictionary<string, object>
 			{
-				["userID"] = userId
+				["text"] = text
 			};
 		}
 
-
+		
 
 		internal override object ProcessResponse(HttpStatusCode status, string json)
 		{
 			if (status != HttpStatusCode.OK)
 			{
-				return false;
+				return -1;
 			}
 
-			var typeDef = new { message = "" };
+			var typeDef = new { id = 0, time = 0 };
 			var data = JsonConvert.DeserializeAnonymousType(json, typeDef);
-			var msg = data?.message?.ToUpperInvariant() ?? "";
+			var id = data?.id ?? -1;
 
-			return msg.StartsWith("THE USER HAS NEEB KICKED AND CANNOT RETURN");
+			return id;
 		}
 	}
 }

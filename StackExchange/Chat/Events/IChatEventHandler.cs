@@ -4,8 +4,8 @@ using System.Text;
 
 namespace StackExchange.Chat.Events
 {
-	public abstract class ChatEvent
+	public interface IChatEventHandler<T>
 	{
-
+		event Action<T> OnEvent;
 	}
 }

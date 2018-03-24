@@ -4,13 +4,13 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class Delete : ChatAction
+	public class MessageEdit : ChatAction
 	{
 		private readonly int messageId;
 
 		internal override Method RequestMethod => Method.POST;
 
-		internal override string Endpoint => $"https://{Host}/messages/{messageId}/delete";
+		internal override string Endpoint => $"https://{Host}/messages/{messageId}";
 
 		internal override bool RequiresFKey => true;
 
@@ -20,9 +20,14 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public Delete(int messageId)
+		public MessageEdit(int messageId, string text)
 		{
 			this.messageId = messageId;
+
+			Data = new Dictionary<string, object>
+			{
+				["text"] = text
+			};
 		}
 
 

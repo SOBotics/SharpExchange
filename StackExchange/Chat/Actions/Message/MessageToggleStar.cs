@@ -4,7 +4,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class ToggleStar : ChatAction
+	public class MessageToggleStar : ChatAction
 	{
 		private readonly int messageId;
 
@@ -20,7 +20,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public ToggleStar(int messageId)
+		public MessageToggleStar(int messageId)
 		{
 			this.messageId = messageId;
 		}

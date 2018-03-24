@@ -2,13 +2,15 @@
 using System.Net;
 using RestSharp;
 
-namespace StackExchange.Chat.Actions.Room
+namespace StackExchange.Chat.Actions.Message
 {
-	public class Timeout : ChatAction
+	public class MessageClearStars : ChatAction
 	{
+		private readonly int messageId;
+
 		internal override Method RequestMethod => Method.POST;
 
-		internal override string Endpoint => $"https://{Host}/rooms/timeout/{RoomId}";
+		internal override string Endpoint => $"https://{Host}/messages/{messageId}/unstar";
 
 		internal override bool RequiresFKey => true;
 
@@ -18,13 +20,9 @@ namespace StackExchange.Chat.Actions.Room
 
 
 
-		public Timeout(int durationSeconds, string reason)
+		public MessageClearStars(int messageId)
 		{
-			Data = new Dictionary<string, object>
-			{
-				["duration"] = durationSeconds,
-				["reason"] = reason
-			};
+			this.messageId = messageId;
 		}
 
 
@@ -32,7 +30,7 @@ namespace StackExchange.Chat.Actions.Room
 		internal override object ProcessResponse(HttpStatusCode status, string response)
 		{
 			return status == HttpStatusCode.OK &&
-				response?.ToUpperInvariant() == "TIMEOUT APPLIED";
+				response?.ToUpperInvariant() == "\"OK\"";
 		}
 	}
 }

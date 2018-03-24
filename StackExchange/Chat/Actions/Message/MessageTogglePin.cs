@@ -4,30 +4,25 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class Edit : ChatAction
+	public class MessageTogglePin : ChatAction
 	{
 		private readonly int messageId;
 
 		internal override Method RequestMethod => Method.POST;
 
-		internal override string Endpoint => $"https://{Host}/messages/{messageId}";
+		internal override string Endpoint => $"https://{Host}/messages/{messageId}/owner-star";
 
 		internal override bool RequiresFKey => true;
 
 		internal override bool RequiresAuthCookies => true;
 
-		internal override ActionPermissionLevel RequiredPermissionLevel => ActionPermissionLevel.Anyone;
+		internal override ActionPermissionLevel RequiredPermissionLevel => ActionPermissionLevel.RoomOwner;
 
 
 
-		public Edit(int messageId, string text)
+		public MessageTogglePin(int messageId)
 		{
 			this.messageId = messageId;
-
-			Data = new Dictionary<string, object>
-			{
-				["text"] = text
-			};
 		}
 
 
