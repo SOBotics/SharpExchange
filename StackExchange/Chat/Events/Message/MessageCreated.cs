@@ -11,6 +11,8 @@ namespace StackExchange.Chat.Events.Message
 
 		public void ProcessEventData(string json)
 		{
+			throw new NotImplementedException();
+			//TODO: Finish off implementation.
 			dynamic data = JObject.Parse(json);
 			var msgId = data.message_id;
 			var msg = new Chat.Message("", msgId);
