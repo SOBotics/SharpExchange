@@ -1,35 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
+using StackExchange.Net.WebSocket;
 
 namespace StackExchange.Net.WebSockets
 {
 	public class DefaultWebSocket : IWebSocket
 	{
 		private string endpoint;
+		private string origin;
 		private ClientWebSocket socket;
 		private CancellationTokenSource socketTokenSource;
 		private bool dispose;
-
-		public string Endpoint
-		{
-			get => endpoint;
-
-			set
-			{
-				if (string.IsNullOrEmpty(value))
-				{
-					throw new ArgumentException($"'{nameof(value)}' cannot be null or empty.");
-				}
-
-				endpoint = value;
-			}
-		}
-
-		public string Origin { get; set; }
 
 		public event Action OnOpen;
 		public event Action<string> OnTextMessage;
@@ -64,19 +48,24 @@ namespace StackExchange.Net.WebSockets
 			GC.SuppressFinalize(this);
 		}
 
-		public void Connect()
+		public void Connect(string endpoint, string origin = null)
 		{
+			if (string.IsNullOrEmpty(endpoint))
+			{
+				throw new ArgumentException($"'{nameof(endpoint)}' cannot be null or empty.");
+			}
+
 			if (socket.State == WebSocketState.Open || socket.State == WebSocketState.Connecting)
 			{
 				throw new Exception("WebSocket is already open/connecting.");
 			}
 			
-			if (!string.IsNullOrEmpty(Origin))
+			if (!string.IsNullOrEmpty(origin))
 			{
-				socket.Options.SetRequestHeader("Origin", Origin);
+				socket.Options.SetRequestHeader("Origin", origin);
 			}
 
-			socket.ConnectAsync(new Uri(Endpoint), socketTokenSource.Token).Wait();
+			socket.ConnectAsync(new Uri(endpoint), socketTokenSource.Token).Wait();
 
 			Task.Run(() => Listen());
 
@@ -171,28 +160,35 @@ namespace StackExchange.Net.WebSockets
 
 		private void HandleNewMessage(WebSocketReceiveResult msgInfo, byte[] buffer)
 		{
-			switch (msgInfo.MessageType)
+			try
 			{
-				case WebSocketMessageType.Text:
+				switch (msgInfo.MessageType)
 				{
-					var text = Encoding.UTF8.GetString(buffer, 0, msgInfo.Count);
+					case WebSocketMessageType.Text:
+					{
+						var text = Encoding.UTF8.GetString(buffer, 0, msgInfo.Count);
 
-					OnTextMessage?.Invoke(text);
+						OnTextMessage?.Invoke(text);
 
-					break;
+						break;
+					}
+					case WebSocketMessageType.Binary:
+					{
+						OnBinaryMessage?.Invoke(buffer);
+
+						break;
+					}
+					case WebSocketMessageType.Close:
+					{
+						Stop();
+
+						break;
+					}
 				}
-				case WebSocketMessageType.Binary:
-				{
-					OnBinaryMessage?.Invoke(buffer);
-
-					break;
-				}
-				case WebSocketMessageType.Close:
-				{
-					Stop();
-
-					break;
-				}
+			}
+			catch (Exception ex)
+			{
+				OnError?.Invoke(ex);
 			}
 		}
 	}

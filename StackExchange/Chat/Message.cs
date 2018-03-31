@@ -1,9 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
-using System.Linq;
 using System.Net;
-using System.Text;
 using AngleSharp.Parser.Html;
 using StackExchange.Net;
 
@@ -50,9 +48,13 @@ namespace StackExchange.Chat
 
 
 
-		public Message(string host, int messageId, CookieManager cookieManager = null)
+		public Message(string host, int messageId, IEnumerable<Net.Cookie> authCookies = null)
 		{
-			cMan = cookieManager;
+			if (authCookies != null)
+			{
+				cMan = new CookieManager(authCookies);
+			}
+
 			Host = host;
 			Id = messageId;
 

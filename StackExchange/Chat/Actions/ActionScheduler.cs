@@ -23,28 +23,28 @@ namespace StackExchange.Chat.Actions
 
 
 
-		public ActionScheduler(string roomUrl, IEnumerable<Cookie> authenticationCookies)
+		public ActionScheduler(IEnumerable<Cookie> authCookies, string roomUrl)
 		{
+			if (authCookies == null)
+			{
+				throw new ArgumentNullException(nameof(authCookies));
+			}
+
+			if (authCookies.Count() == 0)
+			{
+				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.");
+			}
+
 			if (string.IsNullOrEmpty(roomUrl))
 			{
 				throw new ArgumentException($"'{nameof(roomUrl)}' cannot be null or empty.");
-			}
-
-			if (authenticationCookies == null)
-			{
-				throw new ArgumentNullException(nameof(authenticationCookies));
-			}
-
-			if (authenticationCookies.Count() == 0)
-			{
-				throw new ArgumentException($"'{nameof(authenticationCookies)}' cannot be empty.", nameof(authenticationCookies));
 			}
 
 			roomUrl.GetHostAndIdFromRoomUrl(out var host, out var id);
 
 			Host = host;
 			RoomId = id;
-			AuthCookies = new CookieManager(authenticationCookies);
+			AuthCookies = new CookieManager(authCookies);
 
 			queueMre = new ManualResetEvent(false);
 			actionQueue = new Queue<ChatAction>();
@@ -52,8 +52,18 @@ namespace StackExchange.Chat.Actions
 			Task.Run(new Action(ProcessQueue));
 		}
 
-		public ActionScheduler(string host, int roomId, IEnumerable<Cookie> authenticationCookies)
+		public ActionScheduler(IEnumerable<Cookie> authCookies, string host, int roomId)
 		{
+			if (authCookies == null)
+			{
+				throw new ArgumentNullException(nameof(authCookies));
+			}
+
+			if (authCookies.Count() == 0)
+			{
+				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.");
+			}
+
 			if (string.IsNullOrEmpty(host))
 			{
 				throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.");
@@ -64,19 +74,9 @@ namespace StackExchange.Chat.Actions
 				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
 			}
 
-			if (authenticationCookies == null)
-			{
-				throw new ArgumentNullException(nameof(authenticationCookies));
-			}
-
-			if (authenticationCookies.Count() == 0)
-			{
-				throw new ArgumentException($"'{nameof(authenticationCookies)}' cannot be empty.", nameof(authenticationCookies));
-			}
-
 			Host = host;
 			RoomId = roomId;
-			AuthCookies = new CookieManager(authenticationCookies);
+			AuthCookies = new CookieManager(authCookies);
 
 			queueMre = new ManualResetEvent(false);
 			actionQueue = new Queue<ChatAction>();

@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using StackExchange.Net;
+using System.Threading.Tasks;
+using Newtonsoft.Json.Linq;
 using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events
@@ -11,14 +10,21 @@ namespace StackExchange.Chat.Events
 	{
 		private bool dispose;
 
+		public int RoomId { get; private set; }
+
 		public IWebSocket WebSocket { get; private set; }
 
 		public List<IChatEventDataProcessor> EventProcessors { get; private set; }
 
 
 
-		public EventRouter(IWebSocket webSocket, IEnumerable<IChatEventDataProcessor> eventProcessors = null)
+		public EventRouter(int roomId, IWebSocket webSocket, IEnumerable<IChatEventDataProcessor> eventProcessors = null)
 		{
+			if (roomId < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
+			}
+
 			if (webSocket == null)
 			{
 				throw new ArgumentNullException(nameof(webSocket));
@@ -32,6 +38,8 @@ namespace StackExchange.Chat.Events
 			{
 				EventProcessors = new List<IChatEventDataProcessor>(eventProcessors);
 			}
+
+			RoomId = roomId;
 
 			WebSocket = webSocket;
 
@@ -59,13 +67,26 @@ namespace StackExchange.Chat.Events
 
 		private void HandleNewMessage(string json)
 		{
-			foreach (var processor in EventProcessors)
-			{
-				//TODO: Only process events from the current room.
-				//TODO: Only invoke processors that match their respective event.
+			var path = $"r{RoomId}.e";
+			var roomEvents = JObject.Parse(json).SelectToken(path);
 
-				processor.ProcessEventData(json);
+			if (roomEvents == null) return;
+
+			foreach (var ev in roomEvents)
+			{
+				var eventType = ev.Value<int>("event_type");
+
+				foreach (var processor in EventProcessors)
+				{
+					if (processor.Event != EventType.All && processor.Event != (EventType)eventType)
+					{
+						continue;
+					}
+
+					Task.Run(() => processor.ProcessEventData(ev));
+				}
 			}
+
 		}
 	}
 }

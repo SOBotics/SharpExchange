@@ -20,6 +20,7 @@ namespace StackExchange.Auth
 			return Get(dom);
 		}
 
+		//TODO: Cache returned value.
 		public static string Get(IHtmlDocument dom)
 		{
 			if (dom == null)

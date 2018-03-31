@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
-using System.Text;
 using Newtonsoft.Json.Linq;
 using StackExchange.Auth;
 using StackExchange.Net;
@@ -26,8 +25,13 @@ namespace StackExchange.Chat.Events
 
 
 
-		public RoomWatcher(string roomUrl, IEnumerable<Cookie> authCookies)
+		public RoomWatcher(IEnumerable<Cookie> authCookies, string roomUrl)
 		{
+			if (authCookies.Count() == 0)
+			{
+				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.", nameof(authCookies));
+			}
+
 			if (string.IsNullOrEmpty(roomUrl))
 			{
 				throw new ArgumentException($"'{nameof(roomUrl)}' cannot be null or empty.", nameof(roomUrl));
@@ -38,28 +42,13 @@ namespace StackExchange.Chat.Events
 				throw new ArgumentNullException(nameof(authCookies));
 			}
 
-			if (authCookies.Count() == 0)
-			{
-				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.", nameof(authCookies));
-			}
-
 			roomUrl.GetHostAndIdFromRoomUrl(out var host, out var roomId);
 
-			Initialise(host, roomId, authCookies);
+			Initialise(authCookies, host, roomId);
 		}
 
-		public RoomWatcher(string host, int roomId, IEnumerable<Cookie> authCookies)
+		public RoomWatcher(IEnumerable<Cookie> authCookies, string host, int roomId)
 		{
-			if (string.IsNullOrEmpty(host))
-			{
-				throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.");
-			}
-
-			if (roomId < 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
-			}
-
 			if (authCookies == null)
 			{
 				throw new ArgumentNullException(nameof(authCookies));
@@ -70,12 +59,22 @@ namespace StackExchange.Chat.Events
 				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.", nameof(authCookies));
 			}
 
-			Initialise(host, roomId, authCookies);
+			if (string.IsNullOrEmpty(host))
+			{
+				throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.");
+			}
+
+			if (roomId < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
+			}
+
+			Initialise(authCookies, host, roomId);
 		}
 
 
 
-		private void Initialise(string host, int roomId, IEnumerable<Cookie> authCookies)
+		private void Initialise(IEnumerable<Cookie> authCookies, string host, int roomId)
 		{
 			var cookies = new List<Cookie>(authCookies);
 
@@ -84,19 +83,16 @@ namespace StackExchange.Chat.Events
 			RoomId = roomId;
 
 			WebSocket = GetWebSocket();
-			EventRouter = new EventRouter(WebSocket);
+			EventRouter = new EventRouter(roomId, WebSocket);
 		}
 
 		private IWebSocket GetWebSocket()
 		{
-			var url = GetWebSocketUrl();
 			var wsType = typeof(T);
 			var ws = (IWebSocket)Activator.CreateInstance(wsType);
+			var url = GetWebSocketUrl();
 
-			ws.Endpoint = url;
-			ws.Origin = $"https://{Host}";
-
-			ws.Connect();
+			ws.Connect(url, $"https://{Host}");
 
 			return ws;
 		}
