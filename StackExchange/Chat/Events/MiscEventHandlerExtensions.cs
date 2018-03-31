@@ -1,9 +1,9 @@
 ﻿using System;
 using StackExchange.Net.WebSockets;
 
-namespace StackExchange.Chat.Events.EventHandlerExtensions
+namespace StackExchange.Chat.Events.Extensions
 {
-	public static class CustomEx
+	public static class Extensions
 	{
 		public static void AddEventHandler<T>(this RoomWatcher<T> rw, IChatEventDataProcessor eventProcessor) where T : IWebSocket
 		{

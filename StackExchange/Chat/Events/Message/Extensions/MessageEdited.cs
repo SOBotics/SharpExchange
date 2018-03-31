@@ -1,10 +1,9 @@
 ﻿using System;
-using StackExchange.Chat.Events.Message;
 using StackExchange.Net.WebSockets;
 
-namespace StackExchange.Chat.Events.EventHandlerExtensions
+namespace StackExchange.Chat.Events.Message.Extensions
 {
-	public static class MessageEditedEx
+	public static partial class Extensions
 	{
 		public static MessageEdited AddMessageEditedEventHandler<T>(this RoomWatcher<T> rw, Action<MessageEdit> callback) where T : IWebSocket
 		{
@@ -22,7 +21,7 @@ namespace StackExchange.Chat.Events.EventHandlerExtensions
 			return eventProcessor;
 		}
 
-		public static MessageEdited AddMessageEditedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Message, User> callback) where T : IWebSocket
+		public static MessageEdited AddMessageEditedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Message, Chat.User> callback) where T : IWebSocket
 		{
 			if (callback == null)
 			{
@@ -34,7 +33,7 @@ namespace StackExchange.Chat.Events.EventHandlerExtensions
 			eventProcessor.OnEvent += me =>
 			{
 				var message = new Chat.Message(rw.Host, me.Message, rw.AuthCookies);
-				var user = new User(rw.Host, me.EditedBy);
+				var user = new Chat.User(rw.Host, me.EditedBy);
 
 				callback(message, user);
 			};

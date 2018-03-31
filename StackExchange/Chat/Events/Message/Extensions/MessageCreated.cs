@@ -1,16 +1,10 @@
 ﻿using System;
-using StackExchange.Chat.Events.Message;
 using StackExchange.Net.WebSockets;
 
-namespace StackExchange.Chat.Events.EventHandlerExtensions
+namespace StackExchange.Chat.Events.Message.Extensions
 {
-	public static class MessageCreatedEx
+	public static partial class Extensions
 	{
-		/// <summary></summary>
-		/// <param name="callback">
-		/// A function that accepts the new message's ID which
-		/// will be invoked when this event is triggered.
-		/// </param>
 		public static MessageCreated AddMessageCreatedEventHandler<T>(this RoomWatcher<T> rw, Action<int> callback) where T : IWebSocket
 		{
 			if (callback == null)
