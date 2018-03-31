@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using StackExchange.Net;
+using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events
 {
@@ -16,15 +17,12 @@ namespace StackExchange.Chat.Events
 
 
 
-		public EventRouter()
-		{
-			//WebSocket = ??? get default websocket implementation
-			EventProcessors = new List<IChatEventDataProcessor>();
-		}
-
 		public EventRouter(IWebSocket webSocket, IEnumerable<IChatEventDataProcessor> eventProcessors = null)
 		{
-			WebSocket = webSocket;
+			if (webSocket == null)
+			{
+				throw new ArgumentNullException(nameof(webSocket));
+			}
 
 			if (eventProcessors == null)
 			{
@@ -34,6 +32,10 @@ namespace StackExchange.Chat.Events
 			{
 				EventProcessors = new List<IChatEventDataProcessor>(eventProcessors);
 			}
+
+			WebSocket = webSocket;
+
+			WebSocket.OnTextMessage += HandleNewMessage;
 		}
 
 		~EventRouter()
@@ -52,6 +54,18 @@ namespace StackExchange.Chat.Events
 			WebSocket?.Dispose();
 
 			GC.SuppressFinalize(this);
+		}
+
+
+		private void HandleNewMessage(string json)
+		{
+			foreach (var processor in EventProcessors)
+			{
+				//TODO: Only process events from the current room.
+				//TODO: Only invoke processors that match their respective event.
+
+				processor.ProcessEventData(json);
+			}
 		}
 	}
 }

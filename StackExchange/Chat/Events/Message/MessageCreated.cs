@@ -7,12 +7,15 @@ namespace StackExchange.Chat.Events.Message
 {
 	public class MessageCreated : IChatEventDataProcessor, IChatEventHandler<Chat.Message>
 	{
+		public EventType Event => EventType.MessagePosted;
+
 		public event Action<Chat.Message> OnEvent;
 
 		public void ProcessEventData(string json)
 		{
-			throw new NotImplementedException();
 			//TODO: Finish off implementation.
+			return;
+
 			dynamic data = JObject.Parse(json);
 			var msgId = data.message_id;
 			var msg = new Chat.Message("", msgId);
