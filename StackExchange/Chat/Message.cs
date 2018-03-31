@@ -70,6 +70,39 @@ namespace StackExchange.Chat
 
 
 
+		public static bool operator ==(Message a, Message b)
+		{
+			var aNull = ReferenceEquals(a, null);
+			var bNull = ReferenceEquals(b, null);
+
+			if (aNull && bNull)
+			{
+				return true;
+			}
+
+			if (!aNull)
+			{
+				return a.Equals(b);
+			}
+
+			return b.Equals(a);
+		}
+
+		public static bool operator !=(Message a, Message b) => !(a == b);
+
+		public override bool Equals(object obj)
+		{
+			if (ReferenceEquals(obj, null)) return false;
+
+			var m = obj as Message;
+
+			if (ReferenceEquals(m, null)) return false;
+
+			return m.Id == Id;
+		}
+
+		public override int GetHashCode() => Id;
+
 		public override string ToString()
 		{
 			if (Text == null)
@@ -78,19 +111,6 @@ namespace StackExchange.Chat
 			}
 
 			return Text;
-		}
-
-		public override int GetHashCode() => Id;
-
-		public override bool Equals(object obj)
-		{
-			if (obj == null) return false;
-
-			var m = obj as Message;
-
-			if (m == null) return false;
-
-			return m.Id == Id;
 		}
 
 		public static bool Exists(string host, int messageId, CookieManager cookieManager = null)
