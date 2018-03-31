@@ -5,7 +5,7 @@ namespace StackExchange.Chat.Events.Message
 {
 	public class MessageEdit
 	{
-		public int MessageId { get; set; }
+		public int Message { get; set; }
 
 		public int EditedBy { get; set; }
 	}
@@ -23,7 +23,7 @@ namespace StackExchange.Chat.Events.Message
 
 			OnEvent?.Invoke(new MessageEdit
 			{
-				MessageId = msgId,
+				Message = msgId,
 				EditedBy = usrId
 			});
 		}

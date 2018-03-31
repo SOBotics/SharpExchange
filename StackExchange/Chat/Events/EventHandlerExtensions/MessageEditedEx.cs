@@ -33,8 +33,8 @@ namespace StackExchange.Chat.Events.EventHandlerExtensions
 
 			eventProcessor.OnEvent += me =>
 			{
-				var message = new Chat.Message(rw.Host, me.MessageId, rw.AuthCookies);
-				var user = new User("", 0);//TODO: implement class
+				var message = new Chat.Message(rw.Host, me.Message, rw.AuthCookies);
+				var user = new User(rw.Host, me.EditedBy);
 
 				callback(message, user);
 			};
