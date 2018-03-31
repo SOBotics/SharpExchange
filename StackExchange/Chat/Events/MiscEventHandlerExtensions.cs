@@ -1,7 +1,7 @@
 ﻿using System;
 using StackExchange.Net.WebSockets;
 
-namespace StackExchange.Chat.Events.Extensions
+namespace StackExchange.Chat.Events
 {
 	public static class Extensions
 	{
