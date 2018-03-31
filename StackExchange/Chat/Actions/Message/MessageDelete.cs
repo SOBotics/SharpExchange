@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Net;
+﻿using System.Net;
 using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message

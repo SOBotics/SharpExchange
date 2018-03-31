@@ -1,11 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net;
-using System.Text;
 using RestSharp;
-using StackExchange.Auth;
-using StackExchange.Net;
 
 namespace StackExchange.Chat.Actions
 {

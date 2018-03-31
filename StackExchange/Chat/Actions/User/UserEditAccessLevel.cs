@@ -1,6 +1,5 @@
 ﻿using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json;
 using RestSharp;
 
 namespace StackExchange.Chat.Actions.User
