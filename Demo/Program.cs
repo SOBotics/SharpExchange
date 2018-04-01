@@ -3,13 +3,9 @@ using Newtonsoft.Json.Linq;
 using StackExchange.Auth;
 using StackExchange.Chat;
 using StackExchange.Chat.Events;
-using StackExchange.Chat.Events.Room.Extensions;
-using StackExchange.Chat.Events.User.Extensions;
 using StackExchange.Chat.Events.Message.Extensions;
 using StackExchange.Net.WebSockets;
-using StackExchange.Chat.Events.Message;
 using StackExchange.Chat.Actions;
-using StackExchange.Chat.Actions.Message;
 
 namespace Demo
 {

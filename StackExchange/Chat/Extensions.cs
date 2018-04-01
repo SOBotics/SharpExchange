@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Text;
-
-namespace StackExchange.Chat
+﻿namespace StackExchange.Chat
 {
 	public static class Extensions
 	{

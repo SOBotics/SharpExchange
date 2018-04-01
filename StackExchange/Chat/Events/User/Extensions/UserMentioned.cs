@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events.User.Extensions
