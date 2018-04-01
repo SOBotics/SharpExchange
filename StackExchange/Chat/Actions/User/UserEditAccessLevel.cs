@@ -18,7 +18,7 @@ namespace StackExchange.Chat.Actions.User
 
 
 
-		public UserEditAccessLevel(int targetUserId, UserRoomAccessLevel newAccessLevel)
+		public UserEditAccessLevel(int targetUserId, UserAccessLevel newAccessLevel)
 		{
 			Data = new Dictionary<string, object>
 			{
@@ -27,22 +27,22 @@ namespace StackExchange.Chat.Actions.User
 
 			switch (newAccessLevel)
 			{
-				case UserRoomAccessLevel.Normal:
+				case UserAccessLevel.Normal:
 				{
 					Data["userAccess"] = "remove";
 					break;
 				}
-				case UserRoomAccessLevel.ReadOnly:
+				case UserAccessLevel.ReadOnly:
 				{
 					Data["userAccess"] = "read-only";
 					break;
 				}
-				case UserRoomAccessLevel.ReadWrite:
+				case UserAccessLevel.ReadWrite:
 				{
 					Data["userAccess"] = "read-write";
 					break;
 				}
-				case UserRoomAccessLevel.Owner:
+				case UserAccessLevel.Owner:
 				{
 					Data["userAccess"] = "owner";
 					break;
