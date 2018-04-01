@@ -37,6 +37,8 @@ namespace StackExchange.Chat
 
 		public string Host { get; private set; }
 
+		public int RoomId { get; private set; }
+
 		public int Id { get; private set; }
 
 		public int AuthorId { get; private set; }
@@ -76,6 +78,7 @@ namespace StackExchange.Chat
 			var html = HttpRequest.Get(endpoint, cMan);
 			var dom = new HtmlParser().Parse(html);
 
+			RoomId = GetRoomId(dom);
 			FetchHistory(dom);
 			Stars = GetStars(dom, out var pinnerId);
 			IsPinned = pinnerId != null;
@@ -149,6 +152,15 @@ namespace StackExchange.Chat
 			return status == HttpStatusCode.OK ? text : null;
 		}
 
+		private int GetRoomId(IHtmlDocument dom)
+		{
+			var link = dom.QuerySelector(".message a")?.Attributes["href"].Value;
+
+			var idStr = link.Split('?')[0].Split('/')[2];
+
+			return int.Parse(idStr);
+		}
+
 		private void FetchHistory(IHtmlDocument dom)
 		{
 			var monos = dom.QuerySelectorAll("#content h2:nth-of-type(2) ~ div");
@@ -156,7 +168,7 @@ namespace StackExchange.Chat
 
 			foreach (var mono in monos)
 			{
-				var messageText = mono.QuerySelector(".message-source").TextContent;
+				var messageText = mono.QuerySelector(".message-source")?.TextContent;
 
 				if (string.IsNullOrEmpty(messageText))
 				{
