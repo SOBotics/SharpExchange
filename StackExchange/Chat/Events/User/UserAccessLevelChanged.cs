@@ -5,18 +5,18 @@ using Newtonsoft.Json.Linq;
 
 namespace StackExchange.Chat.Events.User
 {
-	public class UserAccessLevelChange
+	public class ChangedUserAccessLevel
 	{
 		public int ChangedBy { get; internal set; }
 		public int TargetUser { get; internal set; }
 		public UserAccessLevel NewLevel { get; internal set; }
 	}
 
-	public class UserAccessLevelChanged : IChatEventDataProcessor, IChatEventHandler<UserAccessLevelChange>
+	public class UserAccessLevelChanged : IChatEventDataProcessor, IChatEventHandler<ChangedUserAccessLevel>
 	{
 		public EventType Event => EventType.UserAccessLevelChanged;
 
-		public event Action<UserAccessLevelChange> OnEvent;
+		public event Action<ChangedUserAccessLevel> OnEvent;
 
 		public void ProcessEventData(JToken data)
 		{
@@ -47,7 +47,7 @@ namespace StackExchange.Chat.Events.User
 				}
 			}
 
-			OnEvent?.Invoke(new UserAccessLevelChange
+			OnEvent?.Invoke(new ChangedUserAccessLevel
 			{
 				ChangedBy = userId,
 				TargetUser = targetUserId,

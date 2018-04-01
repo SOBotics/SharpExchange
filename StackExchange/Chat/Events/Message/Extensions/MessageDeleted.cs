@@ -5,7 +5,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 {
 	public static partial class Extensions
 	{
-		public static MessageDeleted AddMessageDeletedEventHandler<T>(this RoomWatcher<T> rw, Action<MessageDelete> callback) where T : IWebSocket
+		public static MessageDeleted AddMessageDeletedEventHandler<T>(this RoomWatcher<T> rw, Action<DeletedMessage> callback) where T : IWebSocket
 		{
 			if (callback == null)
 			{

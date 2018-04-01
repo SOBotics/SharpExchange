@@ -7,7 +7,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 {
 	public static partial class Extensions
 	{
-		public static UserMentioned AddUserMentionedEventHandler<T>(this RoomWatcher<T> rw, Action<UserMention> callback) where T : IWebSocket
+		public static UserMentioned AddUserMentionedEventHandler<T>(this RoomWatcher<T> rw, Action<MentionedUser> callback) where T : IWebSocket
 		{
 			if (callback == null)
 			{

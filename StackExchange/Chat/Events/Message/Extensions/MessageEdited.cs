@@ -5,7 +5,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 {
 	public static partial class Extensions
 	{
-		public static MessageEdited AddMessageEditedEventHandler<T>(this RoomWatcher<T> rw, Action<MessageEdit> callback) where T : IWebSocket
+		public static MessageEdited AddMessageEditedEventHandler<T>(this RoomWatcher<T> rw, Action<EditedMessage> callback) where T : IWebSocket
 		{
 			if (callback == null)
 			{

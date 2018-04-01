@@ -3,25 +3,25 @@ using Newtonsoft.Json.Linq;
 
 namespace StackExchange.Chat.Events.Message
 {
-	public class MessageEdit
+	public class EditedMessage
 	{
 		public int Message { get; set; }
 
 		public int EditedBy { get; set; }
 	}
 
-	public class MessageEdited : IChatEventDataProcessor, IChatEventHandler<MessageEdit>
+	public class MessageEdited : IChatEventDataProcessor, IChatEventHandler<EditedMessage>
 	{
 		public EventType Event => EventType.MessageEdited;
 
-		public event Action<MessageEdit> OnEvent;
+		public event Action<EditedMessage> OnEvent;
 
 		public void ProcessEventData(JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var usrId = data.Value<int>("user_id");
 
-			OnEvent?.Invoke(new MessageEdit
+			OnEvent?.Invoke(new EditedMessage
 			{
 				Message = msgId,
 				EditedBy = usrId

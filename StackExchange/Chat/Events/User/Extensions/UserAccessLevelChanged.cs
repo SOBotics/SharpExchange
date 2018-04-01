@@ -7,7 +7,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 {
 	public static partial class Extensions
 	{
-		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(this RoomWatcher<T> rw, Action<UserAccessLevelChange> callback) where T : IWebSocket
+		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(this RoomWatcher<T> rw, Action<ChangedUserAccessLevel> callback) where T : IWebSocket
 		{
 			if (callback == null)
 			{

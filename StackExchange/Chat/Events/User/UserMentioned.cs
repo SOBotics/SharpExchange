@@ -3,18 +3,18 @@ using Newtonsoft.Json.Linq;
 
 namespace StackExchange.Chat.Events.User
 {
-	public class UserMention
+	public class MentionedUser
 	{
 		public int MessageId { get; internal set; }
 		public int PingerId { get; internal set; }
 		public int PingeeId { get; internal set; }
 	}
 
-	public class UserMentioned : IChatEventDataProcessor, IChatEventHandler<UserMention>
+	public class UserMentioned : IChatEventDataProcessor, IChatEventHandler<MentionedUser>
 	{
 		public EventType Event => EventType.UserMentioned;
 
-		public event Action<UserMention> OnEvent;
+		public event Action<MentionedUser> OnEvent;
 
 		public void ProcessEventData(JToken data)
 		{
@@ -22,7 +22,7 @@ namespace StackExchange.Chat.Events.User
 			var pingerId = data.Value<int>("user_id");
 			var pingeeId = data.Value<int>("target_user_id");
 
-			OnEvent?.Invoke(new UserMention
+			OnEvent?.Invoke(new MentionedUser
 			{
 				MessageId = msgId,
 				PingerId = pingerId,
