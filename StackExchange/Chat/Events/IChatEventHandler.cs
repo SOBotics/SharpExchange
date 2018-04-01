@@ -6,4 +6,9 @@ namespace StackExchange.Chat.Events
 	{
 		event Action<T> OnEvent;
 	}
+
+	public interface IChatEventHandler
+	{
+		event Action OnEvent;
+	}
 }
