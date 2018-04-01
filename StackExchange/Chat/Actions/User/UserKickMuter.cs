@@ -5,7 +5,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.User
 {
-	public class UserKickMute : ChatAction
+	public class UserKickMuter : ChatAction
 	{
 		internal override Method RequestMethod => Method.POST;
 
@@ -19,7 +19,7 @@ namespace StackExchange.Chat.Actions.User
 
 
 
-		public UserKickMute(int userId)
+		public UserKickMuter(int userId)
 		{
 			Data = new Dictionary<string, object>
 			{

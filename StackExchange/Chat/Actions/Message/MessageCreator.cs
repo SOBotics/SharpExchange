@@ -5,7 +5,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class MessageCreate : ChatAction
+	public class MessageCreator : ChatAction
 	{
 		internal override Method RequestMethod => Method.POST;
 
@@ -19,7 +19,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public MessageCreate(string text)
+		public MessageCreator(string text)
 		{
 			Data = new Dictionary<string, object>
 			{

@@ -3,7 +3,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class MessageTogglePin : ChatAction
+	public class MessagePinToggler : ChatAction
 	{
 		private readonly int messageId;
 
@@ -19,7 +19,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public MessageTogglePin(int messageId)
+		public MessagePinToggler(int messageId)
 		{
 			this.messageId = messageId;
 		}

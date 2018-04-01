@@ -3,7 +3,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class MessageDelete : ChatAction
+	public class MessageDeleter : ChatAction
 	{
 		private readonly int messageId;
 
@@ -19,7 +19,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public MessageDelete(int messageId)
+		public MessageDeleter(int messageId)
 		{
 			this.messageId = messageId;
 		}

@@ -4,7 +4,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.User
 {
-	public class UserEditAccessLevel : ChatAction
+	public class UserAccessLevelEditor : ChatAction
 	{
 		internal override Method RequestMethod => Method.POST;
 
@@ -18,7 +18,7 @@ namespace StackExchange.Chat.Actions.User
 
 
 
-		public UserEditAccessLevel(int targetUserId, UserAccessLevel newAccessLevel)
+		public UserAccessLevelEditor(int targetUserId, UserAccessLevel newAccessLevel)
 		{
 			Data = new Dictionary<string, object>
 			{

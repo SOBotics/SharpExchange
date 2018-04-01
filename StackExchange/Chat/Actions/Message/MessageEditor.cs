@@ -4,7 +4,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class MessageEdit : ChatAction
+	public class MessageEditor : ChatAction
 	{
 		private readonly int messageId;
 
@@ -20,7 +20,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public MessageEdit(int messageId, string text)
+		public MessageEditor(int messageId, string text)
 		{
 			this.messageId = messageId;
 

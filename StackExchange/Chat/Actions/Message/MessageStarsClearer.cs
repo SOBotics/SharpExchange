@@ -3,7 +3,7 @@ using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
 {
-	public class MessageClearStars : ChatAction
+	public class MessageStarsClearer : ChatAction
 	{
 		private readonly int messageId;
 
@@ -19,7 +19,7 @@ namespace StackExchange.Chat.Actions.Message
 
 
 
-		public MessageClearStars(int messageId)
+		public MessageStarsClearer(int messageId)
 		{
 			this.messageId = messageId;
 		}
