@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
+using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using StackExchange.Net;
 
@@ -44,6 +45,12 @@ namespace StackExchange.Chat
 
 		public string Text { get; private set; }
 
+		public int Stars { get; private set; }
+
+		public bool IsPinned { get; private set; }
+
+		public int PinnedBy { get; private set; }
+
 		public ReadOnlyCollection<Revision> Revisions { get; private set; }
 
 
@@ -65,7 +72,14 @@ namespace StackExchange.Chat
 				throw new Exception($"Unable to fetch message {Id}: {status}.");
 			}
 
-			FetchHistory();
+			var endpoint = $"https://{Host}/messages/{Id}/history";
+			var html = HttpRequest.Get(endpoint, cMan);
+			var dom = new HtmlParser().Parse(html);
+
+			FetchHistory(dom);
+			Stars = GetStars(dom, out var pinnerId);
+			IsPinned = pinnerId != null;
+			PinnedBy = pinnerId ?? 0;
 		}
 
 
@@ -135,11 +149,8 @@ namespace StackExchange.Chat
 			return status == HttpStatusCode.OK ? text : null;
 		}
 
-		private void FetchHistory()
+		private void FetchHistory(IHtmlDocument dom)
 		{
-			var endpoint = $"https://{Host}/messages/{Id}/history";
-			var html = HttpRequest.Get(endpoint, cMan);
-			var dom = new HtmlParser().Parse(html);
 			var monos = dom.QuerySelectorAll("#content h2:nth-of-type(2) ~ div");
 			var revs = new List<Revision>();
 
@@ -173,6 +184,35 @@ namespace StackExchange.Chat
 			AuthorId = revs[0].AuthorId;
 			AuthorName = revs[0].AuthorName;
 			Revisions = new ReadOnlyCollection<Revision>(revs);
+		}
+
+		private int GetStars(IHtmlDocument dom, out int? pinnedBy)
+		{
+			var hasStars = dom.QuerySelector(".stars") != null;
+
+			pinnedBy = null;
+
+			if (!hasStars)
+			{
+				return 0;
+			}
+
+			var starCount = dom
+				.QuerySelector(".times")
+				?.TextContent ?? "1";
+
+			var pinnedByStr = dom
+				.QuerySelector("#content p a")
+				?.Attributes["href"]
+				?.Value
+				.Split('/')[2];
+
+			if (int.TryParse(pinnedByStr, out var temp))
+			{
+				pinnedBy = temp;
+			}
+
+			return int.Parse(starCount);
 		}
 	}
 }
