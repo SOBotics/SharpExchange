@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Text;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -10,19 +8,6 @@ namespace StackExchange.Chat
 {
 	public class User
 	{
-		public class MessageCountStats
-		{
-			public int AllTime { get; internal set; }
-
-			public int DayCurrent { get; internal set; }
-
-			public int DayAverage { get; internal set; }
-
-			public int WeekCurrent { get; internal set; }
-
-			public int WeekAverage { get; internal set; }
-		}
-
 		public class Room
 		{
 			public int Id { get; internal set; }
@@ -214,11 +199,11 @@ namespace StackExchange.Chat
 
 			return new MessageCountStats
 			{
-				AllTime = int.Parse(allTimeMsgStr),
-				DayCurrent = int.Parse(dayCurrentStr),
-				DayAverage = int.Parse(dayAvgStr),
-				WeekCurrent = int.Parse(weekCurrentStr),
-				WeekAverage = int.Parse(weekAvgStr),
+				AllTime = allTimeMsgStr.ParseFriendlyNumber(),
+				DayCurrent = dayCurrentStr.ParseFriendlyNumber(),
+				DayAverage = dayAvgStr.ParseFriendlyNumber(),
+				WeekCurrent = weekCurrentStr.ParseFriendlyNumber(),
+				WeekAverage = weekAvgStr.ParseFriendlyNumber(),
 			};
 		}
 

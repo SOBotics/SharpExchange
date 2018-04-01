@@ -23,5 +23,27 @@ namespace StackExchange
 			id = int.Parse(split[2]);
 			host = uri.Host;
 		}
+
+		public static int ParseFriendlyNumber(this string str)
+		{
+			var strClean = str
+				.Replace(",", "")
+				.Trim()
+				.ToUpperInvariant();
+			var multiplier = 1;
+
+			if (strClean.EndsWith("K"))
+			{
+				multiplier = 1000;
+				strClean = strClean.Substring(0, strClean.Length - 1).Trim();
+			}
+
+			if (!float.TryParse(strClean, out var baseNum))
+			{
+				return 0;
+			}
+
+			return (int)Math.Round(baseNum * multiplier);
+		}
 	}
 }
