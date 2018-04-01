@@ -1,4 +1,5 @@
-﻿using System.Net;
+﻿using System;
+using System.Net;
 using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
@@ -21,6 +22,11 @@ namespace StackExchange.Chat.Actions.Message
 
 		public MessageDeleter(int messageId)
 		{
+			if (messageId < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(messageId));
+			}
+
 			this.messageId = messageId;
 		}
 

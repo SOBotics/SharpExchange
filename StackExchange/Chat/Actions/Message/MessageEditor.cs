@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using RestSharp;
 
@@ -22,6 +23,16 @@ namespace StackExchange.Chat.Actions.Message
 
 		public MessageEditor(int messageId, string text)
 		{
+			if (messageId < 0)
+			{
+				throw new ArgumentOutOfRangeException(nameof(messageId));
+			}
+
+			if (string.IsNullOrEmpty(text))
+			{
+				throw new ArgumentException($"'{nameof(text)}' cannot be null or empty.");
+			}
+
 			this.messageId = messageId;
 
 			Data = new Dictionary<string, object>

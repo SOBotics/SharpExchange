@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Net;
 using RestSharp;
 
@@ -20,6 +21,16 @@ namespace StackExchange.Chat.Actions.Room
 
 		public RoomTimeout(int durationSeconds, string reason)
 		{
+			if (durationSeconds < 5)
+			{
+				throw new ArgumentOutOfRangeException(nameof(durationSeconds), "Must be more than or equal to 5.");
+			}
+
+			if (string.IsNullOrEmpty(reason))
+			{
+				throw new ArgumentException($"'{nameof(reason)}' cannot be null or empty.");
+			}
+
 			Data = new Dictionary<string, object>
 			{
 				["duration"] = durationSeconds,
