@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -109,6 +111,40 @@ namespace StackExchange.Chat
 			}
 
 			return Username;
+		}
+
+		public static User GetMe(IEnumerable<Cookie> authCookies, string host)
+		{
+			if (authCookies == null)
+			{
+				throw new ArgumentNullException(nameof(authCookies));
+			}
+
+			if (authCookies.Count() == 0)
+			{
+				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.");
+			}
+
+			var url = $"https://{host}/faq";
+			var html = HttpRequest.Get(url, new CookieManager(authCookies));
+			var dom = new HtmlParser().Parse(html);
+			var idStr = dom
+				.QuerySelector(".topbar-menu-links a")
+				?.Attributes["href"]
+				?.Value
+				.Split('/')[2];
+
+			if (string.IsNullOrEmpty(idStr))
+			{
+				return null;
+			}
+
+			if (!int.TryParse(idStr, out var id))
+			{
+				return null;
+			}
+
+			return new User(host, id);
 		}
 
 
