@@ -199,7 +199,12 @@ namespace StackExchange.Chat
 
 			var starCount = dom
 				.QuerySelector(".times")
-				?.TextContent ?? "1";
+				?.TextContent;
+
+			if (string.IsNullOrEmpty(starCount))
+			{
+				starCount = "1";
+			}
 
 			var pinnedByStr = dom
 				.QuerySelector("#content p a")
