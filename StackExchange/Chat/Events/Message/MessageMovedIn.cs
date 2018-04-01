@@ -1,0 +1,24 @@
+﻿using System;
+using Newtonsoft.Json.Linq;
+
+namespace StackExchange.Chat.Events.Message
+{
+	public class MessageMovedIn : IChatEventDataProcessor, IChatEventHandler<MovedMessage>
+	{
+		public EventType Event => EventType.MessageMovedIn;
+
+		public event Action<MovedMessage> OnEvent;
+
+		public void ProcessEventData(JToken data)
+		{
+			var msgId = data.Value<int>("message_id");
+			var movedBy = data.Value<int>("user_id");
+
+			OnEvent?.Invoke(new MovedMessage
+			{
+				MessageId = msgId,
+				MovedBy = movedBy
+			});
+		}
+	}
+}
