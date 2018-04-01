@@ -92,7 +92,7 @@
 		/// <summary>
 		/// The current account has been invited to join another room.
 		/// </summary>
-		Invitation = 17,
+		RoomInvitation = 17,
 
 		/// <summary>
 		/// Someone has posted a direct reply to a message posted by this account.
