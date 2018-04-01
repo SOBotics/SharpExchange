@@ -23,6 +23,8 @@ namespace StackExchange.Chat
 		private const string modChar = "♦";
 		private const string roomProfilePath = "https://{0}/rooms/info/{1}";
 
+		public string Host { get; private set; }
+
 		public int Id { get; private set; }
 
 		public string Name { get; private set; }
@@ -55,6 +57,7 @@ namespace StackExchange.Chat
 
 			var dom = new HtmlParser().Parse(html);
 
+			Host = host;
 			Id = roomId;
 			Name = GetName(dom, out var isGallery);
 			IsGallery = isGallery;
@@ -92,14 +95,14 @@ namespace StackExchange.Chat
 		{
 			if (ReferenceEquals(obj, null)) return false;
 
-			var m = obj as User;
+			var r = obj as Room;
 
-			if (ReferenceEquals(m, null)) return false;
+			if (ReferenceEquals(r, null)) return false;
 
-			return m.Id == Id;
+			return GetHashCode() == r.GetHashCode();
 		}
 
-		public override int GetHashCode() => Id;
+		public override int GetHashCode() => new { Host, Id }.GetHashCode();
 
 		public override string ToString()
 		{

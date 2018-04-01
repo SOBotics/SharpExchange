@@ -112,10 +112,10 @@ namespace StackExchange.Chat
 
 			if (ReferenceEquals(m, null)) return false;
 
-			return m.Id == Id;
+			return GetHashCode() == m.GetHashCode();
 		}
 
-		public override int GetHashCode() => Id;
+		public override int GetHashCode() => new { Host, Id }.GetHashCode();
 
 		public override string ToString()
 		{

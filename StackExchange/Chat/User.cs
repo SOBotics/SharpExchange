@@ -20,6 +20,8 @@ namespace StackExchange.Chat
 		private const string modChar = "♦";
 		private const string userProfilePath = "https://{0}/users/{1}";
 
+		public string Host { get; private set; }
+
 		public int Id { get; private set; }
 
 		public string Username { get; private set; }
@@ -52,6 +54,7 @@ namespace StackExchange.Chat
 
 			var dom = new HtmlParser().Parse(html);
 
+			Host = host;
 			Id = userId;
 			Username = GetUsername(dom, out var isMod);
 			IsModerator = isMod;
@@ -89,14 +92,14 @@ namespace StackExchange.Chat
 		{
 			if (ReferenceEquals(obj, null)) return false;
 
-			var m = obj as User;
+			var u = obj as User;
 
-			if (ReferenceEquals(m, null)) return false;
+			if (ReferenceEquals(u, null)) return false;
 
-			return m.Id == Id;
+			return GetHashCode() == u.GetHashCode();
 		}
 
-		public override int GetHashCode() => Id;
+		public override int GetHashCode() => new { Host, Id }.GetHashCode();
 
 		public override string ToString()
 		{
