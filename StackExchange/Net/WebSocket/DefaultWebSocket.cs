@@ -11,7 +11,7 @@ namespace StackExchange.Net.WebSockets
 {
 	public class DefaultWebSocket : IWebSocket
 	{
-		private const int bufferSize = 64 * 1024;
+		private const int bufferSize = 4 * 1024;
 		private ClientWebSocket socket;
 		private CancellationTokenSource socketTokenSource;
 		private bool dispose;
@@ -149,7 +149,11 @@ namespace StackExchange.Net.WebSockets
 
 						msgInfo = socket.ReceiveAsync(b, socketTokenSource.Token).Result;
 
-						buffers.Add(b.Array);
+						var bArray = b.Array;
+
+						Array.Resize(ref bArray, msgInfo.Count);
+
+						buffers.Add(bArray);
 					}
 				}
 				catch (Exception ex)
@@ -162,20 +166,14 @@ namespace StackExchange.Net.WebSockets
 					continue;
 				}
 
-				var totalBytes = (buffers.Count * bufferSize) - (bufferSize - msgInfo.Count);
+				var buffer = new List<byte>();
 
-				var buffer = buffers.Aggregate((a, b) =>
+				foreach (var b in buffers)
 				{
-					var x = a.ToList();
+					buffer.AddRange(b);
+				}
 
-					x.AddRange(b);
-
-					return x.ToArray();
-				})
-				.Take(totalBytes)
-				.ToArray();
-
-				Task.Run(() => HandleNewMessage(msgInfo, buffer));
+				Task.Run(() => HandleNewMessage(msgInfo, buffer.ToArray()));
 			}
 		}
 
