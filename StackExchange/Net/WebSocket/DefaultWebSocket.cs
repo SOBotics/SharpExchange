@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
@@ -9,8 +11,7 @@ namespace StackExchange.Net.WebSockets
 {
 	public class DefaultWebSocket : IWebSocket
 	{
-		private string endpoint;
-		private string origin;
+		private const int bufferSize = 64 * 1024;
 		private ClientWebSocket socket;
 		private CancellationTokenSource socketTokenSource;
 		private bool dispose;
@@ -59,7 +60,7 @@ namespace StackExchange.Net.WebSockets
 			{
 				throw new Exception("WebSocket is already open/connecting.");
 			}
-			
+
 			if (!string.IsNullOrEmpty(origin))
 			{
 				socket.Options.SetRequestHeader("Origin", origin);
@@ -137,12 +138,19 @@ namespace StackExchange.Net.WebSockets
 		{
 			while (!dispose)
 			{
-				var buffer = new ArraySegment<byte>(new byte[64 * 1024]);
-				WebSocketReceiveResult msgInfo;
+				var buffers = new List<byte[]>();
+				WebSocketReceiveResult msgInfo = null;
 
 				try
 				{
-					msgInfo = socket.ReceiveAsync(buffer, socketTokenSource.Token).Result;
+					while (!msgInfo?.EndOfMessage ?? true)
+					{
+						var b = new ArraySegment<byte>(new byte[bufferSize]);
+
+						msgInfo = socket.ReceiveAsync(b, socketTokenSource.Token).Result;
+
+						buffers.Add(b.Array);
+					}
 				}
 				catch (Exception ex)
 				{
@@ -154,7 +162,20 @@ namespace StackExchange.Net.WebSockets
 					continue;
 				}
 
-				Task.Run(() => HandleNewMessage(msgInfo, buffer.Array));
+				var totalBytes = (buffers.Count * bufferSize) - (bufferSize - msgInfo.Count);
+
+				var buffer = buffers.Aggregate((a, b) =>
+				{
+					var x = a.ToList();
+
+					x.AddRange(b);
+
+					return x.ToArray();
+				})
+				.Take(totalBytes)
+				.ToArray();
+
+				Task.Run(() => HandleNewMessage(msgInfo, buffer));
 			}
 		}
 
@@ -166,7 +187,7 @@ namespace StackExchange.Net.WebSockets
 				{
 					case WebSocketMessageType.Text:
 					{
-						var text = Encoding.UTF8.GetString(buffer, 0, msgInfo.Count);
+						var text = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
 
 						OnTextMessage?.Invoke(text);
 
