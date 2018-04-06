@@ -154,9 +154,10 @@ namespace StackExchange.Net.WebSockets
 						buffers.Add(bArray);
 					}
 				}
-				catch (TaskCanceledException)
+				catch (AggregateException)
 				{
-					// Do nothing, we don't care.
+					// During normal operation, this is only
+					// ever raised during task cancellation.
 				}
 				catch (Exception ex)
 				{
