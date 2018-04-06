@@ -21,7 +21,7 @@ namespace StackExchange.Chat.Events.Room.Extensions
 				callback(room);
 			};
 
-			rw.EventRouter.EventProcessors.Add(eventProcessor);
+			rw.EventRouter.AddProcessor(eventProcessor);
 
 			return eventProcessor;
 		}

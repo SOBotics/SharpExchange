@@ -10,13 +10,13 @@ namespace StackExchange.Chat.Events.Message
 		public int EditedBy { get; set; }
 	}
 
-	public class MessageEdited : IChatEventDataProcessor, IChatEventHandler<EditedMessage>
+	public class MessageEdited : ChatEventDataProcessor, IChatEventHandler<EditedMessage>
 	{
-		public EventType Event => EventType.MessageEdited;
+		public override EventType Event => EventType.MessageEdited;
 
 		public event Action<EditedMessage> OnEvent;
 
-		public void ProcessEventData(JToken data)
+		public override void ProcessEventData(JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var usrId = data.Value<int>("user_id");

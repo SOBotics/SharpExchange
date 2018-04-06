@@ -16,7 +16,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 			eventProcessor.OnEvent += callback;
 
-			rw.EventRouter.EventProcessors.Add(eventProcessor);
+			rw.EventRouter.AddProcessor(eventProcessor);
 
 			return eventProcessor;
 		}
@@ -39,7 +39,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 				callback(inviter, invitee, room);
 			};
 
-			rw.EventRouter.EventProcessors.Add(eventProcessor);
+			rw.EventRouter.AddProcessor(eventProcessor);
 
 			return eventProcessor;
 		}

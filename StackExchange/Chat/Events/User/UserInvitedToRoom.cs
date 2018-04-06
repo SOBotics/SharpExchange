@@ -10,13 +10,13 @@ namespace StackExchange.Chat.Events.User
 		public int Room { get; internal set; }
 	}
 
-	public class UserInvitedToRoom : IChatEventDataProcessor, IChatEventHandler<RoomInvite>
+	public class UserInvitedToRoom : ChatEventDataProcessor, IChatEventHandler<RoomInvite>
 	{
-		public EventType Event => EventType.RoomInvitation;
+		public override EventType Event => EventType.RoomInvitation;
 
 		public event Action<RoomInvite> OnEvent;
 
-		public void ProcessEventData(JToken data)
+		public override void ProcessEventData(JToken data)
 		{
 			var inviter = data.Value<int>("user_id");
 			var invitee = data.Value<int>("target_user_id");

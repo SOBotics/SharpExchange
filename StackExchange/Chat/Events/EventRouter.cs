@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using StackExchange.Net.WebSockets;
@@ -8,17 +9,19 @@ namespace StackExchange.Chat.Events
 {
 	public class EventRouter : IDisposable
 	{
+		private List<ChatEventDataProcessor> processors;
 		private bool dispose;
 
 		public int RoomId { get; private set; }
 
 		public IWebSocket WebSocket { get; private set; }
 
-		public List<IChatEventDataProcessor> EventProcessors { get; private set; }
+		public ReadOnlyCollection<ChatEventDataProcessor> EventProcessors =>
+			new ReadOnlyCollection<ChatEventDataProcessor>(processors);
 
 
 
-		public EventRouter(int roomId, IWebSocket webSocket, IEnumerable<IChatEventDataProcessor> eventProcessors = null)
+		public EventRouter(int roomId, IWebSocket webSocket)
 		{
 			if (roomId < 0)
 			{
@@ -30,14 +33,7 @@ namespace StackExchange.Chat.Events
 				throw new ArgumentNullException(nameof(webSocket));
 			}
 
-			if (eventProcessors == null)
-			{
-				EventProcessors = new List<IChatEventDataProcessor>();
-			}
-			else
-			{
-				EventProcessors = new List<IChatEventDataProcessor>(eventProcessors);
-			}
+			processors = new List<ChatEventDataProcessor>();
 
 			RoomId = roomId;
 
@@ -58,11 +54,34 @@ namespace StackExchange.Chat.Events
 			if (dispose) return;
 			dispose = true;
 
-			EventProcessors?.Clear();
+			processors?.Clear();
 			WebSocket?.Dispose();
 
 			GC.SuppressFinalize(this);
 		}
+
+		public void AddProcessor(ChatEventDataProcessor p)
+		{
+			if (p == null)
+			{
+				throw new ArgumentNullException(nameof(p));
+			}
+
+			p.RoomId = RoomId;
+
+			processors.Add(p);
+		}
+
+		public bool RemoveProcessor(ChatEventDataProcessor p)
+		{
+			if (p == null)
+			{
+				throw new ArgumentNullException(nameof(p));
+			}
+
+			return processors.Remove(p);
+		}
+
 
 
 		private void HandleNewMessage(string json)
@@ -86,7 +105,6 @@ namespace StackExchange.Chat.Events
 					Task.Run(() => processor.ProcessEventData(ev));
 				}
 			}
-
 		}
 	}
 }

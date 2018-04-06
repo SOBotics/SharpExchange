@@ -3,23 +3,23 @@ using Newtonsoft.Json.Linq;
 using StackExchange.Auth;
 using StackExchange.Chat;
 using StackExchange.Chat.Events;
-using StackExchange.Chat.Events.Message.Extensions;
+using StackExchange.Chat.Events.User.Extensions;
 using StackExchange.Net.WebSockets;
 using StackExchange.Chat.Actions;
 
 namespace Demo
 {
-	public class AllData : IChatEventDataProcessor, IChatEventHandler<string>
+	public class AllData : ChatEventDataProcessor, IChatEventHandler<string>
 	{
 		// The type of event we want to process.
-		public EventType Event => EventType.All;
+		public override EventType Event => EventType.All;
 
 		public event Action<string> OnEvent;
 
 		// Process the incoming JSON data coming from the RoomWatcher's
 		// WebSocket. In this example, we just stringify the object and
 		// invoke any listeners.
-		public void ProcessEventData(JToken data) => OnEvent?.Invoke(data.ToString());
+		public override void ProcessEventData(JToken data) => OnEvent?.Invoke(data.ToString());
 	}
 
 	public class Program
@@ -54,27 +54,24 @@ namespace Demo
 			// Post a simple message.
 			var messageId = actionScheduler.CreateMessage("Hello world.");
 
-			// Subscribe to the MessageCreated event.
-			roomWatcher.AddMessageCreatedEventHandler(m =>
+			// Subscribe to the UserMentioned event.
+			roomWatcher.AddUserMentionedEventHandler(m =>
 			{
-				if (m.AuthorId != me.Id && m.Text == "explode")
-				{
-					actionScheduler.CreateMessage("*boom*");
-				}
+				actionScheduler.CreateReply("hello!", m);
 			});
 
 			// Besides being able to subscribe to the default events,
 			// you can also create (and listen to) your own. Your class must
-			// implement the IChatEventDataProcessor interface, you can also
+			// implement the ChatEventDataProcessor class, you can also
 			// optionally implement the IChatEventHandler or IChatEventHandler<T>.
 			var customEventHanlder = new AllData();
 
 			// Add a very basic handler.
 			customEventHanlder.OnEvent += data => Console.WriteLine(data);
 
-			// Add our custom event handler to the RoomWatcher so we
-			// can begin processing the incoming event data.
-			roomWatcher.AddEventHandler(customEventHanlder);
+			// Add our custom event handler so we can
+			// begin processing the incoming event data.
+			roomWatcher.EventRouter.AddProcessor(customEventHanlder);
 
 			Console.Read();
 		}

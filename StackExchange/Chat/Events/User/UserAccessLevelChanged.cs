@@ -10,13 +10,13 @@ namespace StackExchange.Chat.Events.User
 		public UserAccessLevel NewLevel { get; internal set; }
 	}
 
-	public class UserAccessLevelChanged : IChatEventDataProcessor, IChatEventHandler<ChangedUserAccessLevel>
+	public class UserAccessLevelChanged : ChatEventDataProcessor, IChatEventHandler<ChangedUserAccessLevel>
 	{
-		public EventType Event => EventType.UserAccessLevelChanged;
+		public override EventType Event => EventType.UserAccessLevelChanged;
 
 		public event Action<ChangedUserAccessLevel> OnEvent;
 
-		public void ProcessEventData(JToken data)
+		public override void ProcessEventData(JToken data)
 		{
 			var userId = data.Value<int>("user_id");
 			var targetUserId = data.Value<int>("target_user_id");

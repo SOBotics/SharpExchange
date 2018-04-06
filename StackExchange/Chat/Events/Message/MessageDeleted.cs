@@ -9,13 +9,13 @@ namespace StackExchange.Chat.Events.Message
 		public int MessageId { get; internal set; }
 	}
 
-	public class MessageDeleted : IChatEventDataProcessor, IChatEventHandler<DeletedMessage>
+	public class MessageDeleted : ChatEventDataProcessor, IChatEventHandler<DeletedMessage>
 	{
-		public EventType Event => EventType.MessageDeleted;
+		public override EventType Event => EventType.MessageDeleted;
 
 		public event Action<DeletedMessage> OnEvent;
 
-		public void ProcessEventData(JToken data)
+		public override void ProcessEventData(JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var deletedBy = data.Value<int>("user_id");

@@ -12,13 +12,13 @@ namespace StackExchange.Chat.Events.Message
 		public bool PinnedBySelf { get; internal set; }
 	}
 
-	public class MessageStarToggled : IChatEventDataProcessor, IChatEventHandler<MessageStars>
+	public class MessageStarToggled : ChatEventDataProcessor, IChatEventHandler<MessageStars>
 	{
-		public EventType Event => EventType.MessageStarToggled;
+		public override EventType Event => EventType.MessageStarToggled;
 
 		public event Action<MessageStars> OnEvent;
 
-		public void ProcessEventData(JToken data)
+		public override void ProcessEventData(JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var stars = data.Value<int?>("message_stars");

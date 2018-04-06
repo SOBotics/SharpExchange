@@ -16,7 +16,28 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 			eventProcessor.OnEvent += callback;
 
-			rw.EventRouter.EventProcessors.Add(eventProcessor);
+			rw.EventRouter.AddProcessor(eventProcessor);
+
+			return eventProcessor;
+		}
+
+		public static UserMentioned AddUserMentionedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Message> callback) where T : IWebSocket
+		{
+			if (callback == null)
+			{
+				throw new ArgumentNullException(nameof(callback));
+			}
+
+			var eventProcessor = new UserMentioned();
+
+			eventProcessor.OnEvent += um =>
+			{
+				var msg = new Chat.Message(rw.Host, um.MessageId);
+
+				callback(msg);
+			};
+
+			rw.EventRouter.AddProcessor(eventProcessor);
 
 			return eventProcessor;
 		}
@@ -38,7 +59,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 				callback(msg, pinger);
 			};
 
-			rw.EventRouter.EventProcessors.Add(eventProcessor);
+			rw.EventRouter.AddProcessor(eventProcessor);
 
 			return eventProcessor;
 		}

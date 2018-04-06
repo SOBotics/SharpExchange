@@ -16,7 +16,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 
 			eventProcessor.OnEvent += callback;
 
-			rw.EventRouter.EventProcessors.Add(eventProcessor);
+			rw.EventRouter.AddProcessor(eventProcessor);
 
 			return eventProcessor;
 		}
@@ -38,7 +38,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 				callback(movedBy, message);
 			};
 
-			rw.EventRouter.EventProcessors.Add(eventProcessor);
+			rw.EventRouter.AddProcessor(eventProcessor);
 
 			return eventProcessor;
 		}

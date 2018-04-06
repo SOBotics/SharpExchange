@@ -10,13 +10,13 @@ namespace StackExchange.Chat.Events.Message
 		public int TargetMessageId { get; internal set; }
 	}
 
-	public class MessageReplyCreated : IChatEventDataProcessor, IChatEventHandler<MessageReply>
+	public class MessageReplyCreated : ChatEventDataProcessor, IChatEventHandler<MessageReply>
 	{
-		public EventType Event => EventType.MessageReply;
+		public override EventType Event => EventType.MessageReply;
 
 		public event Action<MessageReply> OnEvent;
 
-		public void ProcessEventData(JToken data)
+		public override void ProcessEventData(JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var targetMsgId = data.Value<int>("parent_id");

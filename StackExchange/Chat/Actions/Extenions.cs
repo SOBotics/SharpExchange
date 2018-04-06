@@ -19,6 +19,33 @@ namespace StackExchange.Chat.Actions
 			return (int)actionScheduler.ScheduleAction(action);
 		}
 
+		public static int CreatePing(this ActionScheduler actionScheduler, string message, int userId)
+		{
+			var userToPing = new Chat.User(actionScheduler.Host, userId);
+
+			return CreatePing(actionScheduler, message, userToPing);
+		}
+
+		public static int CreatePing(this ActionScheduler actionScheduler, string message, Chat.User userToPing)
+		{
+			var name = userToPing.Username.Replace(" ", "").Trim();
+			var txt = $"@{name} {message}";
+
+			return CreateMessage(actionScheduler, txt);
+		}
+
+		public static int CreateReply(this ActionScheduler actionScheduler, string message, Chat.Message messageToReplyTo)
+		{
+			return CreateReply(actionScheduler, message, messageToReplyTo.Id);
+		}
+
+		public static int CreateReply(this ActionScheduler actionScheduler, string message, int messageId)
+		{
+			var txt = $":{messageId} {message}";
+
+			return CreateMessage(actionScheduler, txt);
+		}
+
 		public static bool DeleteMessage(this ActionScheduler actionScheduler, int messageId)
 		{
 			if (messageId < 0)
