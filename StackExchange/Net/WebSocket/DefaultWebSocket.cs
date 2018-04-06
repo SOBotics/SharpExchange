@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.WebSockets;
@@ -158,6 +158,8 @@ namespace StackExchange.Net.WebSockets
 				{
 					// During normal operation, this is only
 					// ever raised during task cancellation.
+
+					if (dispose) return;
 				}
 				catch (Exception ex)
 				{
@@ -182,6 +184,8 @@ namespace StackExchange.Net.WebSockets
 
 		private void HandleNewMessage(WebSocketReceiveResult msgInfo, byte[] buffer)
 		{
+			if (msgInfo == null) return;
+
 			try
 			{
 				switch (msgInfo.MessageType)
