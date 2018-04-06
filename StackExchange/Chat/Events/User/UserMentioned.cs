@@ -7,7 +7,6 @@ namespace StackExchange.Chat.Events.User
 	{
 		public int MessageId { get; internal set; }
 		public int PingerId { get; internal set; }
-		public int PingeeId { get; internal set; }
 	}
 
 	public class UserMentioned : IChatEventDataProcessor, IChatEventHandler<MentionedUser>
@@ -20,13 +19,11 @@ namespace StackExchange.Chat.Events.User
 		{
 			var msgId = data.Value<int>("message_id");
 			var pingerId = data.Value<int>("user_id");
-			var pingeeId = data.Value<int>("target_user_id");
 
 			OnEvent?.Invoke(new MentionedUser
 			{
 				MessageId = msgId,
-				PingerId = pingerId,
-				PingeeId = pingeeId
+				PingerId = pingerId
 			});
 		}
 	}
