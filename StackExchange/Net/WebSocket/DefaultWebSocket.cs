@@ -154,11 +154,15 @@ namespace StackExchange.Net.WebSockets
 						buffers.Add(bArray);
 					}
 				}
+				catch (TaskCanceledException)
+				{
+					// Do nothing, we don't care.
+				}
 				catch (Exception ex)
 				{
 					OnError?.Invoke(ex);
 
-					// Wait a second before retrying.
+					// Wait a second before continuing.
 					socketTokenSource.Token.WaitHandle.WaitOne(1000);
 
 					continue;
