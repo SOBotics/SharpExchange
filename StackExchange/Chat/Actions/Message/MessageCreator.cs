@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Net;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 
 namespace StackExchange.Chat.Actions.Message
@@ -42,9 +43,8 @@ namespace StackExchange.Chat.Actions.Message
 				return -1;
 			}
 
-			var typeDef = new { id = 0, time = 0 };
-			var data = JsonConvert.DeserializeAnonymousType(json, typeDef);
-			var id = data?.id ?? -1;
+			var data = JObject.Parse(json);
+			var id = data.Value<int?>("id") ?? -1;
 
 			return id;
 		}
