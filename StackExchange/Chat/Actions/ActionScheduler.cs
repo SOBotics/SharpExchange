@@ -141,7 +141,10 @@ namespace StackExchange.Chat.Actions
 					queueMre.Reset();
 				}
 
-				queueMre.WaitOne();
+				if (queueMre.WaitOne())
+				{
+					break;
+				}
 
 				var act = actionQueue.Dequeue();
 				act.Host = Host;
