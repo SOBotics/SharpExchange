@@ -141,7 +141,7 @@ namespace StackExchange.Chat.Actions
 					queueMre.Reset();
 				}
 
-				if (queueMre.WaitOne())
+				if (queueMre.WaitOne() && dispose)
 				{
 					break;
 				}
