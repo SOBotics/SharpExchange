@@ -9,14 +9,18 @@ namespace StackExchange.Chat.Events.User
 		public int PingerId { get; internal set; }
 	}
 
-	public class UserMentioned : IChatEventDataProcessor, IChatEventHandler<MentionedUser>
+	public class UserMentioned : ChatEventDataProcessor, IChatEventHandler<MentionedUser>
 	{
-		public EventType Event => EventType.UserMentioned;
+		public override EventType Event => EventType.UserMentioned;
 
 		public event Action<MentionedUser> OnEvent;
 
-		public void ProcessEventData(JToken data)
+		public override void ProcessEventData(JToken data)
 		{
+			var roomOrigin = data.Value<int>("room_id");
+
+			if (roomOrigin != RoomId) return;
+
 			var msgId = data.Value<int>("message_id");
 			var pingerId = data.Value<int>("user_id");
 
