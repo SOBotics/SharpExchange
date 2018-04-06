@@ -127,8 +127,6 @@ namespace StackExchange.Net.WebSockets
 				// as a result of cancelling the running operations.
 			}
 
-			socket.CloseAsync(WebSocketCloseStatus.NormalClosure, "", CancellationToken.None).Wait();
-
 			OnClose?.Invoke();
 		}
 
