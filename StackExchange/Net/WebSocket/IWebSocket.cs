@@ -16,7 +16,7 @@ namespace StackExchange.Net.WebSockets
 
 		Uri Endpoint { get; }
 		IReadOnlyDictionary<string, string> Headers { get; }
-		bool WillAttemptReconnect { get; }
+		bool AutoReconnect { get; set; }
 
 		Task ConnectAsync();
 		Task SendAsync(string message);

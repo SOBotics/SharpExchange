@@ -26,7 +26,7 @@ namespace StackExchange.Net.WebSockets
 
 		public Uri Endpoint { get; private set; }
 		public IReadOnlyDictionary<string, string> Headers { get; private set; }
-		public bool WillAttemptReconnect => true;
+		public bool AutoReconnect { get; set; } = true;
 
 
 
@@ -154,6 +154,8 @@ namespace StackExchange.Net.WebSockets
 				catch (Exception e1)
 				{
 					OnError?.Invoke(e1);
+
+					if (!AutoReconnect) return;
 
 					try
 					{
