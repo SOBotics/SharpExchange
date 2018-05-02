@@ -21,14 +21,25 @@ namespace StackExchange.Net.WebSockets
 		public event Action<byte[]> OnBinaryMessage;
 		public event Action OnClose;
 		public event Action<Exception> OnError;
+		public event Action OnReconnectFailed;
+
+		public Uri Endpoint { get; private set; }
+		public IReadOnlyDictionary<string, string> Headers { get; private set; }
+		public bool WillAttemptReconnect => true;
 
 
 
-		public DefaultWebSocket()
+		public DefaultWebSocket(string endpoint, Dictionary<string, string> headers = null)
 		{
+			if (string.IsNullOrEmpty(endpoint))
+			{
+				throw new ArgumentException($"'{nameof(endpoint)}' cannot be null or empty.");
+			}
+
 			socketTokenSource = new CancellationTokenSource();
 
-			socket = new ClientWebSocket();
+			Endpoint = new Uri(endpoint);
+			Headers = headers;
 		}
 
 		~DefaultWebSocket()
@@ -49,24 +60,26 @@ namespace StackExchange.Net.WebSockets
 			GC.SuppressFinalize(this);
 		}
 
-		public void Connect(string endpoint, string origin = null)
+		public void Connect()
 		{
-			if (string.IsNullOrEmpty(endpoint))
-			{
-				throw new ArgumentException($"'{nameof(endpoint)}' cannot be null or empty.");
-			}
+			if (dispose) return;
 
 			if (socket.State == WebSocketState.Open || socket.State == WebSocketState.Connecting)
 			{
 				throw new Exception("WebSocket is already open/connecting.");
 			}
 
-			if (!string.IsNullOrEmpty(origin))
+			socket = new ClientWebSocket();
+
+			if (Headers != null)
 			{
-				socket.Options.SetRequestHeader("Origin", origin);
+				foreach (var kv in Headers)
+				{
+					socket.Options.SetRequestHeader(kv.Key, kv.Value);
+				}
 			}
 
-			socket.ConnectAsync(new Uri(endpoint), socketTokenSource.Token).Wait();
+			socket.ConnectAsync(Endpoint, socketTokenSource.Token).Wait();
 
 			Task.Run(() => Listen());
 
@@ -75,6 +88,8 @@ namespace StackExchange.Net.WebSockets
 
 		public void Send(object message)
 		{
+			if (dispose) return;
+
 			if (socket?.State != WebSocketState.Open)
 			{
 				throw new Exception("The WebSocket must be open before attempting to send a message.");
@@ -99,6 +114,8 @@ namespace StackExchange.Net.WebSockets
 
 		public void Send(byte[] bytes, MessageType messageType)
 		{
+			if (dispose) return;
+
 			if (bytes == null)
 			{
 				throw new ArgumentNullException(nameof(bytes));
@@ -112,7 +129,7 @@ namespace StackExchange.Net.WebSockets
 
 		public void Stop()
 		{
-			if (socket?.State != WebSocketState.Open)
+			if (dispose || socket?.State != WebSocketState.Open)
 			{
 				return;
 			}
@@ -126,8 +143,6 @@ namespace StackExchange.Net.WebSockets
 				// We don't care about any exceptions being raised
 				// as a result of cancelling the running operations.
 			}
-
-			OnClose?.Invoke();
 		}
 
 
@@ -154,21 +169,31 @@ namespace StackExchange.Net.WebSockets
 						buffers.Add(bArray);
 					}
 				}
-				catch (AggregateException)
+				catch (AggregateException ex)
+				when (ex.InnerException?.GetType() == typeof(TaskCanceledException))
 				{
-					// During normal operation, this is only
-					// ever raised during task cancellation.
+					OnClose?.Invoke();
 
-					if (dispose) return;
+					return;
 				}
-				catch (Exception ex)
+				catch (Exception e1)
 				{
-					OnError?.Invoke(ex);
+					OnError?.Invoke(e1);
 
-					// Wait a second before continuing.
-					socketTokenSource.Token.WaitHandle.WaitOne(1000);
+					try
+					{
+						socketTokenSource.Token.WaitHandle.WaitOne(1000);
 
-					continue;
+						Connect();
+					}
+					catch (Exception e2)
+					{
+						OnReconnectFailed?.Invoke();
+						OnError?.Invoke(e2);
+						OnClose?.Invoke();
+					}
+
+					return;
 				}
 
 				var buffer = new List<byte>();

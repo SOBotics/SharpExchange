@@ -7,7 +7,7 @@ using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events
 {
-	public class EventRouter : IDisposable
+	public sealed class EventRouter : IDisposable
 	{
 		private List<ChatEventDataProcessor> processors;
 		private bool dispose;
@@ -21,7 +21,7 @@ namespace StackExchange.Chat.Events
 
 
 
-		public EventRouter(int roomId, IWebSocket webSocket)
+		internal EventRouter(int roomId, IWebSocket webSocket)
 		{
 			if (roomId < 0)
 			{
@@ -37,9 +37,7 @@ namespace StackExchange.Chat.Events
 
 			RoomId = roomId;
 
-			WebSocket = webSocket;
-
-			WebSocket.OnTextMessage += HandleNewMessage;
+			SetWebSocket(webSocket);
 		}
 
 		~EventRouter()
@@ -80,6 +78,14 @@ namespace StackExchange.Chat.Events
 			}
 
 			return processors.Remove(p);
+		}
+
+
+
+		internal void SetWebSocket(IWebSocket ws)
+		{
+			WebSocket = ws;
+			WebSocket.OnTextMessage += HandleNewMessage;
 		}
 
 

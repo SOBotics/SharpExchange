@@ -33,23 +33,20 @@ namespace Demo
 		{
 			// Fetch your account's credentials from somewhere.
 			var auth = new EmailAuthenticationProvider("", "");
-			
-			// Get the authentication cookies.
-			var cookies = auth.GetAuthCookies(mainSiteHost);
 
 			// Create an instance of the ActionScheduler. This will
 			// allow us to execute chat actions like: posting messages,
 			// kicking users, moving messages, etc.
-			var actionScheduler = new ActionScheduler(cookies, roomUrl);
+			var actionScheduler = new ActionScheduler(auth, roomUrl);
 
 			// Create an instance of the RoomWatcher class. Here we
 			// specify (via the type parameter) what WebSocket implementation
 			// we'd like to use. This class allows you to subscribe to chat events.
-			var roomWatcher = new RoomWatcher<DefaultWebSocket>(cookies, roomUrl);
+			var roomWatcher = new RoomWatcher<DefaultWebSocket>(auth, roomUrl);
 
 			// Fetch the current user we're logged in as. (So we can
 			// ignore events caused by ourself later on.)
-			var me = User.GetMe(cookies, chatHost);
+			var me = User.GetMe(auth, chatHost);
 
 			// Post a simple message.
 			var messageId = actionScheduler.CreateMessage("Hello world.");

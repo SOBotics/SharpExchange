@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using StackExchange.Net.WebSocket;
 
 namespace StackExchange.Net.WebSockets
@@ -10,8 +11,13 @@ namespace StackExchange.Net.WebSockets
 		event Action<byte[]> OnBinaryMessage;
 		event Action OnClose;
 		event Action<Exception> OnError;
+		event Action OnReconnectFailed;
 
-		void Connect(string endpoint, string origin = null);
+		Uri Endpoint { get; }
+		IReadOnlyDictionary<string, string> Headers { get; }
+		bool WillAttemptReconnect { get; }
+
+		void Connect();
 		void Send(object message);
 		void Send(byte[] message, MessageType messageType);
 		void Stop();

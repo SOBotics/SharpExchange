@@ -5,6 +5,9 @@ namespace StackExchange
 {
 	public interface IAuthenticationProvider
 	{
-		IEnumerable<Cookie> GetAuthCookies(string host);
+		CookieManager this[string host] { get; }
+
+		void InvalidateHostCache(string host);
+		void InvalidateAllCache();
 	}
 }

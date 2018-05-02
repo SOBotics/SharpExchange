@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using RestSharp;
 using StackExchange.Net;
@@ -10,24 +11,50 @@ namespace StackExchange.Auth
 		private readonly List<string> authCookieNames;
 		private readonly string email;
 		private readonly string password;
+		private readonly Dictionary<string, IReadOnlyCollection<Cookie>> cache;
+
+		public CookieManager this[string host]
+		{
+			get
+			{
+				if (cache.ContainsKey(host))
+				{
+					return new CookieManager(cache[host]);
+				}
+				else
+				{
+					FetchCookies(host);
+
+					return new CookieManager(cache[host]);
+				}
+			}
+		}
 
 
 
 		public EmailAuthenticationProvider(string email, string password)
 		{
+			this.email = email;
+			this.password = password;
+
 			authCookieNames = new List<string>
 			{
 				"prov",
 				"acct"
 			};
 
-			this.email = email;
-			this.password = password;
+			cache = new Dictionary<string, IReadOnlyCollection<Cookie>>();
 		}
 
 
 
-		public IEnumerable<Cookie> GetAuthCookies(string host)
+		public void InvalidateHostCache(string host) => cache.Remove(host);
+
+		public void InvalidateAllCache() => cache.Clear();
+
+
+
+		private void FetchCookies(string host)
 		{
 			//TODO: Temporary until SE stop using openid to
 			// authenticate email/pwd logins.
@@ -62,7 +89,7 @@ namespace StackExchange.Auth
 				throw new InvalidCredentialsException();
 			}
 
-			return authCookies;
+			cache[host] = authCookies;
 		}
 	}
 }

@@ -113,20 +113,15 @@ namespace StackExchange.Chat
 			return Username;
 		}
 
-		public static User GetMe(IEnumerable<Cookie> authCookies, string host)
+		public static User GetMe(IAuthenticationProvider auth, string host)
 		{
-			if (authCookies == null)
+			if (auth == null)
 			{
-				throw new ArgumentNullException(nameof(authCookies));
-			}
-
-			if (authCookies.Count() == 0)
-			{
-				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.");
+				throw new ArgumentNullException(nameof(auth));
 			}
 
 			var url = $"https://{host}/faq";
-			var html = HttpRequest.Get(url, new CookieManager(authCookies));
+			var html = HttpRequest.Get(url, auth[host]);
 			var dom = new HtmlParser().Parse(html);
 			var idStr = dom
 				.QuerySelector(".topbar-menu-links a")

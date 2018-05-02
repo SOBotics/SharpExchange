@@ -11,6 +11,7 @@ namespace StackExchange.Chat.Actions
 {
 	public class ActionScheduler : IDisposable
 	{
+		private IAuthenticationProvider auth;
 		private readonly ManualResetEvent queueMre;
 		private readonly Queue<ChatAction> actionQueue;
 		private bool dispose;
@@ -19,20 +20,13 @@ namespace StackExchange.Chat.Actions
 
 		public int RoomId { get; private set; }
 
-		public CookieManager AuthCookies { get; private set; }
 
 
-
-		public ActionScheduler(IEnumerable<Cookie> authCookies, string roomUrl)
+		public ActionScheduler(IAuthenticationProvider authProvider, string roomUrl)
 		{
-			if (authCookies == null)
+			if (authProvider == null)
 			{
-				throw new ArgumentNullException(nameof(authCookies));
-			}
-
-			if (authCookies.Count() == 0)
-			{
-				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.");
+				throw new ArgumentNullException(nameof(authProvider));
 			}
 
 			if (string.IsNullOrEmpty(roomUrl))
@@ -40,28 +34,23 @@ namespace StackExchange.Chat.Actions
 				throw new ArgumentException($"'{nameof(roomUrl)}' cannot be null or empty.");
 			}
 
+			auth = authProvider;
+			queueMre = new ManualResetEvent(false);
+			actionQueue = new Queue<ChatAction>();
+
 			roomUrl.GetHostAndIdFromRoomUrl(out var host, out var id);
 
 			Host = host;
 			RoomId = id;
-			AuthCookies = new CookieManager(authCookies);
-
-			queueMre = new ManualResetEvent(false);
-			actionQueue = new Queue<ChatAction>();
 
 			Task.Run(new Action(ProcessQueue));
 		}
 
-		public ActionScheduler(IEnumerable<Cookie> authCookies, string host, int roomId)
+		public ActionScheduler(IAuthenticationProvider authProvider, string host, int roomId)
 		{
-			if (authCookies == null)
+			if (authProvider == null)
 			{
-				throw new ArgumentNullException(nameof(authCookies));
-			}
-
-			if (authCookies.Count() == 0)
-			{
-				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.");
+				throw new ArgumentNullException(nameof(authProvider));
 			}
 
 			if (string.IsNullOrEmpty(host))
@@ -74,12 +63,12 @@ namespace StackExchange.Chat.Actions
 				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
 			}
 
-			Host = host;
-			RoomId = roomId;
-			AuthCookies = new CookieManager(authCookies);
-
+			auth = authProvider;
 			queueMre = new ManualResetEvent(false);
 			actionQueue = new Queue<ChatAction>();
+
+			Host = host;
+			RoomId = roomId;
 
 			Task.Run(new Action(ProcessQueue));
 		}
@@ -169,12 +158,12 @@ namespace StackExchange.Chat.Actions
 				{
 					data = new Dictionary<string, object>
 					{
-						["fkey"] = FKeyAccessor.Get(roomUrl, AuthCookies)
+						["fkey"] = FKeyAccessor.Get(roomUrl, auth[Host])
 					};
 				}
 				else
 				{
-					data["fkey"] = FKeyAccessor.Get(roomUrl, AuthCookies);
+					data["fkey"] = FKeyAccessor.Get(roomUrl, auth[Host]);
 				}
 			}
 
@@ -187,7 +176,7 @@ namespace StackExchange.Chat.Actions
 
 			if (act.RequiresAuthCookies)
 			{
-				req.Cookies = AuthCookies;
+				req.Cookies = auth[Host];
 			}
 
 			return req;

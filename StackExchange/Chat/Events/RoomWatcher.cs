@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
 using Newtonsoft.Json.Linq;
 using StackExchange.Auth;
 using StackExchange.Net;
@@ -11,13 +9,11 @@ namespace StackExchange.Chat.Events
 {
 	public class RoomWatcher<T> where T : IWebSocket
 	{
-		private CookieManager cMan => new CookieManager(AuthCookies);
+		private IAuthenticationProvider auth;
 
 		public string Host { get; private set; }
 
 		public int RoomId { get; private set; }
-
-		public ReadOnlyCollection<Cookie> AuthCookies { get; private set; }
 
 		public EventRouter EventRouter { get; private set; }
 		
@@ -25,11 +21,11 @@ namespace StackExchange.Chat.Events
 
 
 
-		public RoomWatcher(IEnumerable<Cookie> authCookies, string roomUrl)
+		public RoomWatcher(IAuthenticationProvider authProvider, string roomUrl)
 		{
-			if (authCookies.Count() == 0)
+			if (authProvider == null)
 			{
-				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.", nameof(authCookies));
+				throw new ArgumentNullException(nameof(authProvider));
 			}
 
 			if (string.IsNullOrEmpty(roomUrl))
@@ -37,26 +33,16 @@ namespace StackExchange.Chat.Events
 				throw new ArgumentException($"'{nameof(roomUrl)}' cannot be null or empty.", nameof(roomUrl));
 			}
 
-			if (authCookies == null)
-			{
-				throw new ArgumentNullException(nameof(authCookies));
-			}
-
 			roomUrl.GetHostAndIdFromRoomUrl(out var host, out var roomId);
 
-			Initialise(authCookies, host, roomId);
+			Initialise(host, roomId);
 		}
 
-		public RoomWatcher(IEnumerable<Cookie> authCookies, string host, int roomId)
+		public RoomWatcher(IAuthenticationProvider authProvider, string host, int roomId)
 		{
-			if (authCookies == null)
+			if (authProvider == null)
 			{
-				throw new ArgumentNullException(nameof(authCookies));
-			}
-
-			if (authCookies.Count() == 0)
-			{
-				throw new ArgumentException($"'{nameof(authCookies)}' cannot be empty.", nameof(authCookies));
+				throw new ArgumentNullException(nameof(authProvider));
 			}
 
 			if (string.IsNullOrEmpty(host))
@@ -69,16 +55,13 @@ namespace StackExchange.Chat.Events
 				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
 			}
 
-			Initialise(authCookies, host, roomId);
+			Initialise(host, roomId);
 		}
 
 
 
-		private void Initialise(IEnumerable<Cookie> authCookies, string host, int roomId)
+		private void Initialise(string host, int roomId)
 		{
-			var cookies = new List<Cookie>(authCookies);
-
-			AuthCookies = new ReadOnlyCollection<Cookie>(cookies);
 			Host = host;
 			RoomId = roomId;
 
@@ -89,10 +72,20 @@ namespace StackExchange.Chat.Events
 		private IWebSocket GetWebSocket()
 		{
 			var wsType = typeof(T);
-			var ws = (IWebSocket)Activator.CreateInstance(wsType);
 			var url = GetWebSocketUrl();
+			var headers = new Dictionary<string, string> { ["Origin"] = $"https://{Host}" };
+			var ws = (IWebSocket)Activator.CreateInstance(wsType, url, headers);
 
-			ws.Connect(url, $"https://{Host}");
+			ws.OnReconnectFailed += () =>
+			{
+				auth.InvalidateHostCache(Host);
+
+				WebSocket = GetWebSocket();
+
+				EventRouter.SetWebSocket(WebSocket);
+			};
+
+			ws.Connect();
 
 			return ws;
 		}
@@ -111,11 +104,11 @@ namespace StackExchange.Chat.Events
 			{
 				Verb = RestSharp.Method.POST,
 				Endpoint = $"https://{Host}/ws-auth",
-				Cookies = cMan,
+				Cookies = auth[Host],
 				Data = new Dictionary<string, object>
 				{
 					["roomid"] = RoomId,
-					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", cMan)
+					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", auth[Host])
 				}
 			}.Send();
 
@@ -135,12 +128,12 @@ namespace StackExchange.Chat.Events
 			{
 				Verb = RestSharp.Method.POST,
 				Endpoint = $"https://{Host}/chats/{RoomId}/events",
-				Cookies = cMan,
+				Cookies = auth[Host],
 				Data = new Dictionary<string, object>
 				{
 					["mode"] = "events",
 					["msgCount"] = 0,
-					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", cMan)
+					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", auth[Host])
 				}
 			}.Send();
 
