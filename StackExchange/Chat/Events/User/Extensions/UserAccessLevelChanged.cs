@@ -7,10 +7,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 	{
 		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(this RoomWatcher<T> rw, Action<ChangedUserAccessLevel> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new UserAccessLevelChanged();
 
@@ -23,10 +20,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.User, Chat.User, UserAccessLevel> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new UserAccessLevelChanged();
 

@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using StackExchange.Net;
@@ -33,10 +32,8 @@ namespace StackExchange.Auth
 		//TODO: Cache returned value.
 		public static string Get(IHtmlDocument dom)
 		{
-			if (dom == null)
-			{
-				throw new ArgumentNullException(nameof(dom));
-			}
+			dom.ThrowIfNull(nameof(dom));
+
 
 			return dom.QuerySelector("input[name=fkey]")?.Attributes["value"]?.Value;
 		}

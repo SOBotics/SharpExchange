@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading.Tasks;
 using StackExchange.Net.WebSocket;
 
 namespace StackExchange.Net.WebSockets
@@ -17,9 +18,8 @@ namespace StackExchange.Net.WebSockets
 		IReadOnlyDictionary<string, string> Headers { get; }
 		bool WillAttemptReconnect { get; }
 
-		void Connect();
-		void Send(object message);
-		void Send(byte[] message, MessageType messageType);
-		void Stop();
+		Task ConnectAsync();
+		Task SendAsync(string message);
+		Task SendAsync(byte[] message, MessageType messageType);
 	}
 }

@@ -7,10 +7,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 	{
 		public static UserMentioned AddUserMentionedEventHandler<T>(this RoomWatcher<T> rw, Action<MentionedUser> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new UserMentioned();
 
@@ -23,10 +20,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 		public static UserMentioned AddUserMentionedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Message> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new UserMentioned();
 
@@ -44,10 +38,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 		public static UserMentioned AddUserMentionedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Message, Chat.User> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new UserMentioned();
 

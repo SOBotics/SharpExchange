@@ -28,10 +28,7 @@ namespace StackExchange.Chat.Actions.Message
 				throw new ArgumentOutOfRangeException(nameof(messageId));
 			}
 
-			if (string.IsNullOrEmpty(text))
-			{
-				throw new ArgumentException($"'{nameof(text)}' cannot be null or empty.");
-			}
+			text.ThrowIfNullOrEmpty(nameof(text));
 
 			this.messageId = messageId;
 

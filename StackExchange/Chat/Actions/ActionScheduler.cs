@@ -24,15 +24,8 @@ namespace StackExchange.Chat.Actions
 
 		public ActionScheduler(IAuthenticationProvider authProvider, string roomUrl)
 		{
-			if (authProvider == null)
-			{
-				throw new ArgumentNullException(nameof(authProvider));
-			}
-
-			if (string.IsNullOrEmpty(roomUrl))
-			{
-				throw new ArgumentException($"'{nameof(roomUrl)}' cannot be null or empty.");
-			}
+			authProvider.ThrowIfNull(nameof(authProvider));
+			roomUrl.ThrowIfNullOrEmpty(nameof(roomUrl));
 
 			auth = authProvider;
 			queueMre = new ManualResetEvent(false);
@@ -40,7 +33,7 @@ namespace StackExchange.Chat.Actions
 
 			roomUrl.GetHostAndIdFromRoomUrl(out var host, out var id);
 
-			Host = host;
+			Host = host.GetChatHost();
 			RoomId = id;
 
 			Task.Run(new Action(ProcessQueue));
@@ -48,15 +41,8 @@ namespace StackExchange.Chat.Actions
 
 		public ActionScheduler(IAuthenticationProvider authProvider, string host, int roomId)
 		{
-			if (authProvider == null)
-			{
-				throw new ArgumentNullException(nameof(authProvider));
-			}
-
-			if (string.IsNullOrEmpty(host))
-			{
-				throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.");
-			}
+			authProvider.ThrowIfNull(nameof(authProvider));
+			host.ThrowIfNullOrEmpty(nameof(host));
 
 			if (roomId < 0)
 			{
@@ -67,7 +53,7 @@ namespace StackExchange.Chat.Actions
 			queueMre = new ManualResetEvent(false);
 			actionQueue = new Queue<ChatAction>();
 
-			Host = host;
+			Host = host.GetChatHost();
 			RoomId = roomId;
 
 			Task.Run(new Action(ProcessQueue));
@@ -97,10 +83,7 @@ namespace StackExchange.Chat.Actions
 		//TODO: Perform permissions check before scheduling action for execution.
 		public object ScheduleAction(ChatAction act, TimeSpan timeout)
 		{
-			if (act == null)
-			{
-				throw new ArgumentNullException(nameof(act));
-			}
+			act.ThrowIfNull(nameof(act));
 
 			var wait = new AutoResetEvent(false);
 			object data = null;

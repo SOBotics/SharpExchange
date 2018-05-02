@@ -7,10 +7,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 	{
 		public static MessageCreated AddMessageCreatedEventHandler<T>(this RoomWatcher<T> rw, Action<int> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new MessageCreated();
 
@@ -23,16 +20,13 @@ namespace StackExchange.Chat.Events.Message.Extensions
 
 		public static MessageCreated AddMessageCreatedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Message> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new MessageCreated();
 
 			eventProcessor.OnEvent += id =>
 			{
-				var message = new Chat.Message(rw.Host, id, rw.AuthCookies);
+				var message = new Chat.Message(rw.Host, id, rw.Auth);
 
 				callback(message);
 			};

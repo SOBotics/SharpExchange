@@ -1,5 +1,4 @@
-﻿using System.Collections.Generic;
-using StackExchange.Net;
+﻿using StackExchange.Net;
 
 namespace StackExchange
 {

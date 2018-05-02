@@ -1,5 +1,5 @@
-﻿using System.Collections.Generic;
-using System.Collections.ObjectModel;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using RestSharp;
 using StackExchange.Net;
@@ -17,6 +17,13 @@ namespace StackExchange.Auth
 		{
 			get
 			{
+				host.ThrowIfNullOrEmpty(nameof(host));
+
+				if (host.StartsWith("chat.", StringComparison.Ordinal))
+				{
+					host = host.Remove(0, 5);
+				}
+
 				if (cache.ContainsKey(host))
 				{
 					return new CookieManager(cache[host]);

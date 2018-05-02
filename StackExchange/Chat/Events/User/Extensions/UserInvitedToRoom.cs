@@ -7,10 +7,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 	{
 		public static UserInvitedToRoom AddUserInvitedToRoomEventHandler<T>(this RoomWatcher<T> rw, Action<RoomInvite> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new UserInvitedToRoom();
 
@@ -23,10 +20,7 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 		public static UserInvitedToRoom AddUserInvitedToRoomEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.User,  Chat.User, Chat.Room> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new UserInvitedToRoom();
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Threading;
 using Newtonsoft.Json.Linq;
 using StackExchange.Auth;
 using StackExchange.Net;
@@ -7,31 +8,26 @@ using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events
 {
-	public class RoomWatcher<T> where T : IWebSocket
+	public class RoomWatcher<T> : IDisposable where T : IWebSocket
 	{
-		private IAuthenticationProvider auth;
+		private bool dispose;
+		private DateTime lastReconnectFailure;
+		private int reconnectWait;
 
+		public IAuthenticationProvider Auth { get; private set; }
 		public string Host { get; private set; }
-
 		public int RoomId { get; private set; }
-
 		public EventRouter EventRouter { get; private set; }
-		
 		public IWebSocket WebSocket { get; private set; }
 
 
 
 		public RoomWatcher(IAuthenticationProvider authProvider, string roomUrl)
 		{
-			if (authProvider == null)
-			{
-				throw new ArgumentNullException(nameof(authProvider));
-			}
+			authProvider.ThrowIfNull(nameof(authProvider));
+			roomUrl.ThrowIfNullOrEmpty(nameof(roomUrl));
 
-			if (string.IsNullOrEmpty(roomUrl))
-			{
-				throw new ArgumentException($"'{nameof(roomUrl)}' cannot be null or empty.", nameof(roomUrl));
-			}
+			Auth = authProvider;
 
 			roomUrl.GetHostAndIdFromRoomUrl(out var host, out var roomId);
 
@@ -40,29 +36,42 @@ namespace StackExchange.Chat.Events
 
 		public RoomWatcher(IAuthenticationProvider authProvider, string host, int roomId)
 		{
-			if (authProvider == null)
-			{
-				throw new ArgumentNullException(nameof(authProvider));
-			}
-
-			if (string.IsNullOrEmpty(host))
-			{
-				throw new ArgumentException($"'{nameof(host)}' cannot be null or empty.");
-			}
+			authProvider.ThrowIfNull(nameof(authProvider));
+			host.ThrowIfNullOrEmpty(nameof(host));
 
 			if (roomId < 0)
 			{
 				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
 			}
 
+			Auth = authProvider;
+
 			Initialise(host, roomId);
+		}
+
+		~RoomWatcher()
+		{
+			Dispose();
+		}
+
+
+
+		public void Dispose()
+		{
+			if (dispose) return;
+			dispose = true;
+
+			EventRouter.Dispose();
+			WebSocket.Dispose();
+
+			GC.SuppressFinalize(this);
 		}
 
 
 
 		private void Initialise(string host, int roomId)
 		{
-			Host = host;
+			Host = host.GetChatHost();
 			RoomId = roomId;
 
 			WebSocket = GetWebSocket();
@@ -76,18 +85,37 @@ namespace StackExchange.Chat.Events
 			var headers = new Dictionary<string, string> { ["Origin"] = $"https://{Host}" };
 			var ws = (IWebSocket)Activator.CreateInstance(wsType, url, headers);
 
-			ws.OnReconnectFailed += () =>
-			{
-				auth.InvalidateHostCache(Host);
+			ws.OnReconnectFailed += HandleReconnectFailure;
 
-				WebSocket = GetWebSocket();
-
-				EventRouter.SetWebSocket(WebSocket);
-			};
-
-			ws.Connect();
+			ws.ConnectAsync().Wait();
 
 			return ws;
+		}
+
+		private void HandleReconnectFailure()
+		{
+			if (dispose) return;
+
+			if ((DateTime.UtcNow - lastReconnectFailure).TotalSeconds < reconnectWait * 2)
+			{
+				reconnectWait += 5;
+
+				reconnectWait = Math.Min(reconnectWait, 60);
+			}
+			else
+			{
+				reconnectWait = 5;
+			}
+
+			lastReconnectFailure = DateTime.UtcNow;
+
+			Thread.Sleep(reconnectWait * 1000);
+
+			Auth.InvalidateHostCache(Host);
+
+			WebSocket = GetWebSocket();
+
+			EventRouter.SetWebSocket(WebSocket);
 		}
 
 		private string GetWebSocketUrl()
@@ -104,11 +132,11 @@ namespace StackExchange.Chat.Events
 			{
 				Verb = RestSharp.Method.POST,
 				Endpoint = $"https://{Host}/ws-auth",
-				Cookies = auth[Host],
+				Cookies = Auth[Host],
 				Data = new Dictionary<string, object>
 				{
 					["roomid"] = RoomId,
-					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", auth[Host])
+					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", Auth[Host])
 				}
 			}.Send();
 
@@ -128,12 +156,12 @@ namespace StackExchange.Chat.Events
 			{
 				Verb = RestSharp.Method.POST,
 				Endpoint = $"https://{Host}/chats/{RoomId}/events",
-				Cookies = auth[Host],
+				Cookies = Auth[Host],
 				Data = new Dictionary<string, object>
 				{
 					["mode"] = "events",
 					["msgCount"] = 0,
-					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", auth[Host])
+					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", Auth[Host])
 				}
 			}.Send();
 

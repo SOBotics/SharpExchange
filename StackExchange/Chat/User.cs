@@ -1,6 +1,4 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -46,6 +44,10 @@ namespace StackExchange.Chat
 
 		public User(string host, int userId)
 		{
+			host.ThrowIfNullOrEmpty(nameof(host));
+
+			host = host.GetChatHost();
+
 			var url = string.Format(userProfilePath, host, userId);
 			var html = HttpRequest.GetWithStatus(url, out var status);
 
@@ -103,22 +105,14 @@ namespace StackExchange.Chat
 
 		public override int GetHashCode() => new { Host, Id }.GetHashCode();
 
-		public override string ToString()
-		{
-			if (Username == null)
-			{
-				throw new NullReferenceException();
-			}
-
-			return Username;
-		}
+		public override string ToString() => Username;
 
 		public static User GetMe(IAuthenticationProvider auth, string host)
 		{
-			if (auth == null)
-			{
-				throw new ArgumentNullException(nameof(auth));
-			}
+			auth.ThrowIfNull(nameof(auth));
+			host.ThrowIfNullOrEmpty(nameof(host));
+
+			host = host.GetChatHost();
 
 			var url = $"https://{host}/faq";
 			var html = HttpRequest.Get(url, auth[host]);

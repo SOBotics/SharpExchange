@@ -7,10 +7,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 	{
 		public static MessageDeleted AddMessageDeletedEventHandler<T>(this RoomWatcher<T> rw, Action<DeletedMessage> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new MessageDeleted();
 
@@ -23,10 +20,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 
 		public static MessageDeleted AddMessageDeletedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.User, int> callback) where T : IWebSocket
 		{
-			if (callback == null)
-			{
-				throw new ArgumentNullException(nameof(callback));
-			}
+			callback.ThrowIfNull(nameof(callback));
 
 			var eventProcessor = new MessageDeleted();
 

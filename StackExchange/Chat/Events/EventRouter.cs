@@ -21,23 +21,20 @@ namespace StackExchange.Chat.Events
 
 
 
-		internal EventRouter(int roomId, IWebSocket webSocket)
+		internal EventRouter(int roomId, IWebSocket ws)
 		{
 			if (roomId < 0)
 			{
 				throw new ArgumentOutOfRangeException(nameof(roomId), $"'{nameof(roomId)}' cannot be negative.");
 			}
 
-			if (webSocket == null)
-			{
-				throw new ArgumentNullException(nameof(webSocket));
-			}
+			ws.ThrowIfNull(nameof(ws));
 
 			processors = new List<ChatEventDataProcessor>();
 
 			RoomId = roomId;
 
-			SetWebSocket(webSocket);
+			SetWebSocket(ws);
 		}
 
 		~EventRouter()
@@ -60,10 +57,7 @@ namespace StackExchange.Chat.Events
 
 		public void AddProcessor(ChatEventDataProcessor p)
 		{
-			if (p == null)
-			{
-				throw new ArgumentNullException(nameof(p));
-			}
+			p.ThrowIfNull(nameof(p));
 
 			p.RoomId = RoomId;
 
@@ -72,10 +66,7 @@ namespace StackExchange.Chat.Events
 
 		public bool RemoveProcessor(ChatEventDataProcessor p)
 		{
-			if (p == null)
-			{
-				throw new ArgumentNullException(nameof(p));
-			}
+			p.ThrowIfNull(nameof(p));
 
 			return processors.Remove(p);
 		}

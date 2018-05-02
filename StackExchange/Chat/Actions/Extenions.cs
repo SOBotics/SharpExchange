@@ -9,10 +9,7 @@ namespace StackExchange.Chat.Actions
 	{
 		public static int CreateMessage(this ActionScheduler actionScheduler, string message)
 		{
-			if (string.IsNullOrEmpty(message))
-			{
-				throw new ArgumentException($"'{nameof(message)}' cannot be null or empty.");
-			}
+			message.ThrowIfNullOrEmpty(nameof(message));
 
 			var action = new MessageCreator(message);
 
@@ -60,10 +57,7 @@ namespace StackExchange.Chat.Actions
 
 		public static bool DeleteMessage(this ActionScheduler actionScheduler, Chat.Message message)
 		{
-			if (message == null)
-			{
-				throw new ArgumentNullException(nameof(message));
-			}
+			message.ThrowIfNull(nameof(message));
 
 			return DeleteMessage(actionScheduler, message.Id);
 		}
@@ -75,10 +69,7 @@ namespace StackExchange.Chat.Actions
 				throw new ArgumentOutOfRangeException(nameof(messageId));
 			}
 
-			if (string.IsNullOrEmpty(newText))
-			{
-				throw new ArgumentException($"'{nameof(newText)}' cannot be null or empty.");
-			}
+			newText.ThrowIfNullOrEmpty(nameof(newText));
 
 			var action = new MessageEditor(messageId, newText);
 
@@ -87,10 +78,7 @@ namespace StackExchange.Chat.Actions
 
 		public static bool EditMessage(this ActionScheduler actionScheduler, Chat.Message message, string newText)
 		{
-			if (message == null)
-			{
-				throw new ArgumentNullException(nameof(message));
-			}
+			message.ThrowIfNull(nameof(message));
 
 			return EditMessage(actionScheduler, message.Id, newText);
 		}
@@ -109,10 +97,7 @@ namespace StackExchange.Chat.Actions
 
 		public static bool TogglePin(this ActionScheduler actionScheduler, Chat.Message message)
 		{
-			if (message == null)
-			{
-				throw new ArgumentNullException(nameof(message));
-			}
+			message.ThrowIfNull(nameof(message));
 
 			return TogglePin(actionScheduler, message.Id);
 		}
@@ -131,10 +116,7 @@ namespace StackExchange.Chat.Actions
 
 		public static bool ClearStars(this ActionScheduler actionScheduler, Chat.Message message)
 		{
-			if (message == null)
-			{
-				throw new ArgumentNullException(nameof(message));
-			}
+			message.ThrowIfNull(nameof(message));
 
 			return ClearStars(actionScheduler, message.Id);
 		}
@@ -153,10 +135,7 @@ namespace StackExchange.Chat.Actions
 
 		public static bool ToggleStar(this ActionScheduler actionScheduler, Chat.Message message)
 		{
-			if (message == null)
-			{
-				throw new ArgumentNullException(nameof(message));
-			}
+			message.ThrowIfNull(nameof(message));
 
 			return ToggleStar(actionScheduler, message.Id);
 		}
@@ -168,10 +147,7 @@ namespace StackExchange.Chat.Actions
 				throw new ArgumentOutOfRangeException(nameof(durationSeconds), "Must be more than or equal to 5.");
 			}
 
-			if (string.IsNullOrEmpty(reason))
-			{
-				throw new ArgumentException($"'{nameof(reason)}' cannot be null or empty.");
-			}
+			reason.ThrowIfNullOrEmpty(nameof(reason));
 
 			var action = new RoomTimeout(durationSeconds, reason);
 
@@ -187,10 +163,7 @@ namespace StackExchange.Chat.Actions
 				throw new ArgumentOutOfRangeException(nameof(duration), "Must total more than or be equal to 5 seconds.");
 			}
 
-			if (string.IsNullOrEmpty(reason))
-			{
-				throw new ArgumentException($"'{nameof(reason)}' cannot be null or empty.");
-			}
+			reason.ThrowIfNullOrEmpty(nameof(reason));
 
 			return TimeoutRoom(actionScheduler, seconds, reason);
 		}
@@ -204,10 +177,7 @@ namespace StackExchange.Chat.Actions
 
 		public static void ChangeUserAccessLevel(this ActionScheduler actionScheduler, Chat.User user, UserAccessLevel newLevel)
 		{
-			if (user == null)
-			{
-				throw new ArgumentNullException(nameof(user));
-			}
+			user.ThrowIfNull(nameof(user));
 
 			ChangeUserAccessLevel(actionScheduler, user.Id, newLevel);
 		}
@@ -221,10 +191,7 @@ namespace StackExchange.Chat.Actions
 
 		public static bool KickMuteUser(this ActionScheduler actionScheduler, Chat.User user)
 		{
-			if (user == null)
-			{
-				throw new ArgumentNullException(nameof(user));
-			}
+			user.ThrowIfNull(nameof(user));
 
 			return KickMuteUser(actionScheduler, user.Id);
 		}

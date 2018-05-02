@@ -1,7 +1,5 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Net;
-using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using RestSharp;
 
@@ -23,10 +21,7 @@ namespace StackExchange.Chat.Actions.Message
 
 		public MessageCreator(string text)
 		{
-			if (string.IsNullOrEmpty(text))
-			{
-				throw new ArgumentException($"'{nameof(text)}' cannot be null or empty.");
-			}
+			text.ThrowIfNullOrEmpty(nameof(text));
 
 			Data = new Dictionary<string, object>
 			{

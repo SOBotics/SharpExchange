@@ -26,10 +26,7 @@ namespace StackExchange.Chat.Actions.Room
 				throw new ArgumentOutOfRangeException(nameof(durationSeconds), "Must be more than or equal to 5.");
 			}
 
-			if (string.IsNullOrEmpty(reason))
-			{
-				throw new ArgumentException($"'{nameof(reason)}' cannot be null or empty.");
-			}
+			reason.ThrowIfNullOrEmpty(nameof(reason));
 
 			Data = new Dictionary<string, object>
 			{

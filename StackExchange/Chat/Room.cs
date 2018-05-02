@@ -45,12 +45,16 @@ namespace StackExchange.Chat
 
 		public Room(string host, int roomId)
 		{
+			host.ThrowIfNullOrEmpty(nameof(host));
+
+			host = host.GetChatHost();
+
 			var url = string.Format(roomProfilePath, host, roomId);
 			var html = HttpRequest.GetWithStatus(url, out var status);
 
 			if (status != System.Net.HttpStatusCode.OK)
 			{
-				throw new Exception($"Unable to find user {roomId} on {host}.");
+				throw new Exception($"Unable to find room {roomId} on {host}.");
 			}
 
 			var dom = new HtmlParser().Parse(html);
@@ -102,15 +106,7 @@ namespace StackExchange.Chat
 
 		public override int GetHashCode() => new { Host, Id }.GetHashCode();
 
-		public override string ToString()
-		{
-			if (Name == null)
-			{
-				throw new NullReferenceException();
-			}
-
-			return Name;
-		}
+		public override string ToString() => Name;
 
 
 

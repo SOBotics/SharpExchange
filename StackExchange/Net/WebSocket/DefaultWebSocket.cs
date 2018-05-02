@@ -1,11 +1,12 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Net.WebSockets;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using StackExchange.Net.WebSocket;
+
+#pragma warning disable CS4014
 
 namespace StackExchange.Net.WebSockets
 {
@@ -31,10 +32,7 @@ namespace StackExchange.Net.WebSockets
 
 		public DefaultWebSocket(string endpoint, Dictionary<string, string> headers = null)
 		{
-			if (string.IsNullOrEmpty(endpoint))
-			{
-				throw new ArgumentException($"'{nameof(endpoint)}' cannot be null or empty.");
-			}
+			endpoint.ThrowIfNullOrEmpty(nameof(endpoint));
 
 			socketTokenSource = new CancellationTokenSource();
 
@@ -54,17 +52,21 @@ namespace StackExchange.Net.WebSockets
 			if (dispose) return;
 			dispose = true;
 
-			Stop();
+			if (socket?.State == WebSocketState.Open)
+			{
+				socketTokenSource.Cancel();
+			}
+
 			socket.Dispose();
 
 			GC.SuppressFinalize(this);
 		}
 
-		public void Connect()
+		public async Task ConnectAsync()
 		{
 			if (dispose) return;
 
-			if (socket.State == WebSocketState.Open || socket.State == WebSocketState.Connecting)
+			if (socket?.State == WebSocketState.Open || socket?.State == WebSocketState.Connecting)
 			{
 				throw new Exception("WebSocket is already open/connecting.");
 			}
@@ -79,14 +81,13 @@ namespace StackExchange.Net.WebSockets
 				}
 			}
 
-			socket.ConnectAsync(Endpoint, socketTokenSource.Token).Wait();
+			await socket.ConnectAsync(Endpoint, socketTokenSource.Token);
 
 			Task.Run(() => Listen());
-
-			OnOpen?.Invoke();
+			OnOpen.InvokeAsync();
 		}
 
-		public void Send(object message)
+		public async Task SendAsync(string message)
 		{
 			if (dispose) return;
 
@@ -95,54 +96,28 @@ namespace StackExchange.Net.WebSockets
 				throw new Exception("The WebSocket must be open before attempting to send a message.");
 			}
 
-			if (message == null)
-			{
-				throw new ArgumentNullException(nameof(message));
-			}
+			message.ThrowIfNullOrEmpty(nameof(message));
 
-			var messageText = message.ToString();
+			var bytes = Encoding.UTF8.GetBytes(message);
 
-			if (string.IsNullOrEmpty(messageText))
-			{
-				throw new Exception($"The returned value from '{nameof(message)}.ToString()' cannot be null or empty.");
-			}
-
-			var bytes = Encoding.UTF8.GetBytes(messageText);
-
-			Send(bytes, MessageType.Text);
+			await SendAsync(bytes, MessageType.Text);
 		}
 
-		public void Send(byte[] bytes, MessageType messageType)
+		public async Task SendAsync(byte[] bytes, MessageType messageType)
 		{
 			if (dispose) return;
 
-			if (bytes == null)
+			if (socket?.State != WebSocketState.Open)
 			{
-				throw new ArgumentNullException(nameof(bytes));
+				throw new Exception("The WebSocket must be open before attempting to send a message.");
 			}
+
+			bytes.ThrowIfNull(nameof(bytes));
 
 			var bytesSegment = new ArraySegment<byte>(bytes);
 			var mType = (WebSocketMessageType)(int)messageType;
 
-			socket.SendAsync(bytesSegment, mType, true, socketTokenSource.Token).Wait();
-		}
-
-		public void Stop()
-		{
-			if (dispose || socket?.State != WebSocketState.Open)
-			{
-				return;
-			}
-
-			try
-			{
-				socketTokenSource.Cancel();
-			}
-			catch
-			{
-				// We don't care about any exceptions being raised
-				// as a result of cancelling the running operations.
-			}
+			await socket.SendAsync(bytesSegment, mType, true, socketTokenSource.Token);
 		}
 
 
@@ -172,7 +147,7 @@ namespace StackExchange.Net.WebSockets
 				catch (AggregateException ex)
 				when (ex.InnerException?.GetType() == typeof(TaskCanceledException))
 				{
-					OnClose?.Invoke();
+					OnClose.InvokeAsync();
 
 					return;
 				}
@@ -184,13 +159,13 @@ namespace StackExchange.Net.WebSockets
 					{
 						socketTokenSource.Token.WaitHandle.WaitOne(1000);
 
-						Connect();
+						ConnectAsync().Wait();
 					}
 					catch (Exception e2)
 					{
-						OnReconnectFailed?.Invoke();
-						OnError?.Invoke(e2);
-						OnClose?.Invoke();
+						OnReconnectFailed.InvokeAsync();
+						OnError.InvokeAsync(e2);
+						OnClose.InvokeAsync();
 					}
 
 					return;
@@ -205,6 +180,8 @@ namespace StackExchange.Net.WebSockets
 
 				Task.Run(() => HandleNewMessage(msgInfo, buffer.ToArray()));
 			}
+
+			OnClose.InvokeAsync();
 		}
 
 		private void HandleNewMessage(WebSocketReceiveResult msgInfo, byte[] buffer)
@@ -213,28 +190,15 @@ namespace StackExchange.Net.WebSockets
 
 			try
 			{
-				switch (msgInfo.MessageType)
+				if (msgInfo.MessageType == WebSocketMessageType.Text)
 				{
-					case WebSocketMessageType.Text:
-					{
-						var text = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
+					var text = Encoding.UTF8.GetString(buffer, 0, buffer.Length);
 
-						OnTextMessage?.Invoke(text);
-
-						break;
-					}
-					case WebSocketMessageType.Binary:
-					{
-						OnBinaryMessage?.Invoke(buffer);
-
-						break;
-					}
-					case WebSocketMessageType.Close:
-					{
-						Stop();
-
-						break;
-					}
+					OnTextMessage?.Invoke(text);
+				}
+				else if (msgInfo.MessageType == WebSocketMessageType.Binary)
+				{
+					OnBinaryMessage?.Invoke(buffer);
 				}
 			}
 			catch (Exception ex)

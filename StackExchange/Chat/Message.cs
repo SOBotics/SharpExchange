@@ -57,14 +57,14 @@ namespace StackExchange.Chat
 
 
 
-		public Message(string host, int messageId, IEnumerable<Net.Cookie> authCookies = null)
+		public Message(string host, int messageId, IAuthenticationProvider auth = null)
 		{
-			if (authCookies != null)
+			if (auth != null)
 			{
-				cMan = new CookieManager(authCookies);
+				cMan = auth[host];
 			}
 
-			Host = host;
+			Host = host.GetChatHost();
 			Id = messageId;
 
 			Text = GetTextWithStatus(Host, Id, cMan, out var status);
@@ -120,15 +120,7 @@ namespace StackExchange.Chat
 
 		public override int GetHashCode() => new { Host, Id }.GetHashCode();
 
-		public override string ToString()
-		{
-			if (Text == null)
-			{
-				throw new NullReferenceException();
-			}
-
-			return Text;
-		}
+		public override string ToString() => Text;
 
 		public static bool Exists(string host, int messageId, CookieManager cookieManager = null)
 		{
@@ -146,7 +138,7 @@ namespace StackExchange.Chat
 
 		private static string GetTextWithStatus(string host, int messageId, CookieManager cookieManager, out HttpStatusCode status)
 		{
-			var endpoint = string.Format(messageTextUrl, host, messageId);
+			var endpoint = string.Format(messageTextUrl, host.GetChatHost(), messageId);
 			var text = HttpRequest.GetWithStatus(endpoint, cookieManager, out status);
 
 			return status == HttpStatusCode.OK ? text : null;
