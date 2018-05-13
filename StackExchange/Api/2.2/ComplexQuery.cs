@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StackExchange.Api.Types
+namespace StackExchange.Api.v22.Types
 {
 	public class ComplexQuery
 	{
