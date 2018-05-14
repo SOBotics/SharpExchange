@@ -10,27 +10,28 @@ namespace StackExchange.Api.v22.Endpoints
 {
 	public static class Answers
 	{
-		private static readonly Dictionary<string, string> validSortFields = new Dictionary<string, string>
+		public static Result<Answer[]> GetAll(QueryOptions options = null)
 		{
-			["activity"] = "last_activity_date",
-			["creation"] = "creation_date",
-			["votes"] = "score"
-		};
+			throw new NotImplementedException();
+		}
 
-		public static Result<Answer[]> Get(BasicQuery bq = null, PageQuery pq = null, ComplexQuery cq = null)
+		public static Result<Answer[]> GetByIds(IEnumerable<int> ids, QueryOptions options = null)
 		{
-			if (cq != null &&
-				!validSortFields.ContainsKey(cq.Sort) &&
-				!validSortFields.ContainsValue(cq.Sort))
-			{
-				var supportFields = validSortFields.Keys.Aggregate((a, b) => a + ", " + b);
-				var errorText = $"Invalid Sort value. Support sort fields: {supportFields}.";
+			throw new NotImplementedException();
+		}
 
-				throw new ArgumentException(errorText, nameof(cq));
-			}
+		public static Result<Answer[]> GetByQuestionIds(IEnumerable<int> questionIds, QueryOptions options = null)
+		{
+			throw new NotImplementedException();
+		}
 
-			//TODO: Finish implementation.
+		public static Result<Answer[]> GetByUserIds(IEnumerable<int> userIds, QueryOptions options = null)
+		{
+			throw new NotImplementedException();
+		}
 
+		public static Result<Answer[]> GetTopAnswersByUserByTags(int userId, IEnumerable<string> tags, QueryOptions options = null)
+		{
 			throw new NotImplementedException();
 		}
 	}
