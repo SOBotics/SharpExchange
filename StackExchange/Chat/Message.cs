@@ -139,9 +139,11 @@ namespace StackExchange.Chat
 		private static string GetTextWithStatus(string host, int messageId, CookieManager cookieManager, out HttpStatusCode status)
 		{
 			var endpoint = string.Format(messageTextUrl, host.GetChatHost(), messageId);
-			var text = HttpRequest.GetWithStatus(endpoint, cookieManager, out status);
+			var result = HttpRequest.GetWithStatus(endpoint, cookieManager);
 
-			return status == HttpStatusCode.OK ? text : null;
+			status = result.Status;
+
+			return result.Status == HttpStatusCode.OK ? result.Body : null;
 		}
 
 		private int GetRoomId(IHtmlDocument dom)

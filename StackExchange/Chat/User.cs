@@ -49,14 +49,14 @@ namespace StackExchange.Chat
 			host = host.GetChatHost();
 
 			var url = string.Format(userProfilePath, host, userId);
-			var html = HttpRequest.GetWithStatus(url, out var status);
+			var result = HttpRequest.GetWithStatus(url);
 
-			if (status != System.Net.HttpStatusCode.OK)
+			if (result.Status != System.Net.HttpStatusCode.OK)
 			{
 				throw new Exception($"Unable to find user {userId} on {host}.");
 			}
 
-			var dom = new HtmlParser().Parse(html);
+			var dom = new HtmlParser().Parse(result.Body);
 
 			Host = host;
 			Id = userId;

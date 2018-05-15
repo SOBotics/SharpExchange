@@ -7,7 +7,7 @@ namespace StackExchange.Api.v22.Types
 		[JsonProperty("accept_rate")]
 		public int? AcceptRate { get; set; }
 
-		[JsonProperty("badge_counts ")]
+		[JsonProperty("badge_counts")]
 		public BadgeCount Badges { get; set; }
 
 		[JsonProperty("display_name")]

@@ -8,7 +8,7 @@
 		[ApiQueryValue("creation")]
 		Creation,
 
-		[ApiQueryValue("vote")]
+		[ApiQueryValue("votes")]
 		Votes
 	}
 }

@@ -2,14 +2,23 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
+using System.Threading.Tasks;
 using RestSharp;
 
 namespace StackExchange.Net
 {
 	public class HttpRequest
 	{
-		private readonly List<Method> supportedMethods;
-		private readonly List<HttpStatusCode> handleRedirectCodes;
+		private static readonly List<Method> supportedMethods = new List<Method>
+		{
+			Method.GET,
+			Method.POST
+		};
+		private static readonly List<HttpStatusCode> handleRedirectCodes = new List<HttpStatusCode>
+		{
+			HttpStatusCode.Found,
+			HttpStatusCode.Moved
+		};
 		private bool sent;
 
 		public Method Verb { get; set; }
@@ -22,53 +31,43 @@ namespace StackExchange.Net
 
 
 
-		public HttpRequest()
+		public static GetWithStatusResult GetWithStatus(string endpoint, CookieManager cMan = null)
 		{
-			supportedMethods = new List<Method>
-			{
-				Method.GET,
-				Method.POST
-			};
-
-			handleRedirectCodes = new List<HttpStatusCode>
-			{
-				HttpStatusCode.Found,
-				HttpStatusCode.Moved
-			};
+			return GetWithStatusAsync(endpoint, cMan).Result;
 		}
 
-
-
-		public static string GetWithStatus(string endpoint, out HttpStatusCode status)
+		public static async Task<GetWithStatusResult> GetWithStatusAsync(string endpoint, CookieManager cMan = null)
 		{
-			return GetWithStatus(endpoint, null, out status);
-		}
-
-		public static string GetWithStatus(string endpoint, CookieManager cMan, out HttpStatusCode status)
-		{
-			var response = new HttpRequest
+			var response = await new HttpRequest
 			{
 				Verb = Method.GET,
 				Endpoint = endpoint,
 				Cookies = cMan
-			}.Send();
+			}.SendAsync();
 
-			status = response.StatusCode;
-
-			return response.Content;
+			return new GetWithStatusResult(response.Content, response.StatusCode);
 		}
 
 		public static string Get(string endpoint, CookieManager cookies = null)
 		{
-			return new HttpRequest
+			return GetAsync(endpoint, cookies).Result;
+		}
+
+		public static async Task<string> GetAsync(string endpoint, CookieManager cookies = null)
+		{
+			var r = await new HttpRequest
 			{
 				Verb = Method.GET,
 				Endpoint = endpoint,
 				Cookies = cookies
-			}.Send().Content;
+			}.SendAsync();
+
+			return r.Content;
 		}
 
-		public RestResponse Send()
+		public RestResponse Send() => SendAsync().Result;
+
+		public async Task<RestResponse> SendAsync()
 		{
 			if (!supportedMethods.Contains(Verb))
 			{
@@ -90,8 +89,7 @@ namespace StackExchange.Net
 
 			var client = new RestClient(baseUrl)
 			{
-				FollowRedirects = false,
-				//Proxy = new WebProxy("127.0.0.1", 8888) // Temp for fiddler
+				FollowRedirects = false
 			};
 
 			var request = new RestRequest(endpointUri.PathAndQuery, Verb);
@@ -124,7 +122,7 @@ namespace StackExchange.Net
 				}
 			}
 
-			var response = (RestResponse)client.Execute(request);
+			var response = await Task.Run(() => (RestResponse)client.Execute(request));
 
 			Cookies?.Add(response.Cookies);
 
@@ -164,7 +162,7 @@ namespace StackExchange.Net
 				Verb = Method.GET,
 				Endpoint = endpoint,
 				Cookies = Cookies
-			}.Send();
+			}.SendAsync().Result;
 		}
 	}
 }
