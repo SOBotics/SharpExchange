@@ -1,18 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
+using System.Text;
 
 namespace StackExchange.Api.v22
 {
 	public class QueryOptions
 	{
 		private const BindingFlags propBindings = BindingFlags.Instance | BindingFlags.Public;
+		private readonly DateTime unixEpoch = new DateTime(1970, 1, 1);
 		private readonly HashSet<Type> enumTypes = new HashSet<Type>
 		{
 			typeof(OrderBy), typeof(SortBy)
 		};
-
-		#region Properties.
 
 		[ApiQueryValue("site")]
 		public string Site { get; set; }
@@ -72,30 +72,62 @@ namespace StackExchange.Api.v22
 		[ApiQueryValue("todate")]
 		public DateTime? ToDate { get; set; }
 
-		#endregion
+		public string Query
+		{
+			get
+			{
+				var builder = new StringBuilder();
+				var opts = GetOptions();
 
-		public Dictionary<string, string> GetOptions()
+				foreach (var o in opts)
+				{
+					builder.Append(o.Key);
+					builder.Append('=');
+					builder.Append(o.Value);
+					builder.Append('&');
+				}
+
+				builder.Remove(builder.Length - 1, 1);
+
+				return builder.ToString();
+			}
+		}
+
+		private Dictionary<string, string> GetOptions()
 		{
 			var props = GetType().GetProperties(propBindings);
 			var opts = new Dictionary<string, string>();
 
 			foreach (var p in props)
 			{
+				var name = p.GetCustomAttribute<ApiQueryValueAttribute>()?.Value;
+
+				if (name == null) continue;
+
 				var val = p.GetValue(this);
 
 				if (val == null) continue;
 
-				var name = p.GetCustomAttribute<ApiQueryValueAttribute>().Value;
 				var vType = val.GetType();
-
-				opts[name] = val.ToString();
 
 				if (enumTypes.Contains(vType))
 				{
+					var enumVal = val.ToString();
+
 					opts[name] = vType
-						.GetMember(opts[name])[0]
+						.GetMember(enumVal)[0]
 						.GetCustomAttribute<ApiQueryValueAttribute>()
 						.Value;
+				}
+				else if (vType == typeof(DateTime))
+				{
+					var secs = ((DateTime)val - unixEpoch).TotalSeconds;
+
+					opts[name] = Math.Round(secs).ToString();
+				}
+				else
+				{
+					opts[name] = val.ToString();
 				}
 			}
 
