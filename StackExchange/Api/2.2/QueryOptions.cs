@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Reflection;
-using System.Text;
 
 namespace StackExchange.Api.v22
 {
@@ -60,6 +59,7 @@ namespace StackExchange.Api.v22
 		[ApiQueryValue("max")]
 		public int? Max { get; set; }
 
+		//TODO: Add ref to question type when implemented
 		/// <summary>
 		/// Defines the start of a range to apply to the CreationDate field.
 		/// </summary>
@@ -72,66 +72,56 @@ namespace StackExchange.Api.v22
 		[ApiQueryValue("todate")]
 		public DateTime? ToDate { get; set; }
 
-		public string Query
+		/// <summary>
+		/// Allows the caller to specify custom fields that
+		/// are currently not exposed by this type.
+		/// </summary>
+		public Dictionary<string, string> Custom { get; set; }
+
+		public string Query => Custom.MergeInto(Options)?.ToQueryString();
+
+		public Dictionary<string, string> Options
 		{
 			get
 			{
-				var builder = new StringBuilder();
-				var opts = GetOptions();
+				var props = GetType().GetProperties(propBindings);
+				var opts = new Dictionary<string, string>();
 
-				foreach (var o in opts)
+				foreach (var p in props)
 				{
-					builder.Append(o.Key);
-					builder.Append('=');
-					builder.Append(o.Value);
-					builder.Append('&');
+					var name = p.GetCustomAttribute<ApiQueryValueAttribute>()?.Value;
+
+					if (name == null) continue;
+
+					var val = p.GetValue(this);
+
+					if (val == null) continue;
+
+					var vType = val.GetType();
+
+					if (enumTypes.Contains(vType))
+					{
+						var enumVal = val.ToString();
+
+						opts[name] = vType
+							.GetMember(enumVal)[0]
+							.GetCustomAttribute<ApiQueryValueAttribute>()
+							.Value;
+					}
+					else if (vType == typeof(DateTime))
+					{
+						var secs = ((DateTime)val - unixEpoch).TotalSeconds;
+
+						opts[name] = Math.Round(secs).ToString();
+					}
+					else
+					{
+						opts[name] = val.ToString();
+					}
 				}
 
-				builder.Remove(builder.Length - 1, 1);
-
-				return builder.ToString();
+				return opts;
 			}
-		}
-
-		private Dictionary<string, string> GetOptions()
-		{
-			var props = GetType().GetProperties(propBindings);
-			var opts = new Dictionary<string, string>();
-
-			foreach (var p in props)
-			{
-				var name = p.GetCustomAttribute<ApiQueryValueAttribute>()?.Value;
-
-				if (name == null) continue;
-
-				var val = p.GetValue(this);
-
-				if (val == null) continue;
-
-				var vType = val.GetType();
-
-				if (enumTypes.Contains(vType))
-				{
-					var enumVal = val.ToString();
-
-					opts[name] = vType
-						.GetMember(enumVal)[0]
-						.GetCustomAttribute<ApiQueryValueAttribute>()
-						.Value;
-				}
-				else if (vType == typeof(DateTime))
-				{
-					var secs = ((DateTime)val - unixEpoch).TotalSeconds;
-
-					opts[name] = Math.Round(secs).ToString();
-				}
-				else
-				{
-					opts[name] = val.ToString();
-				}
-			}
-
-			return opts;
 		}
 	}
 }

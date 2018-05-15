@@ -1,5 +1,7 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq;
+using System.Text;
 using System.Threading.Tasks;
 
 namespace StackExchange
@@ -91,6 +93,56 @@ namespace StackExchange
 			{
 				throw new ArgumentNullException(argName);
 			}
+		}
+
+		public static string ToQueryString(this Dictionary<string, string> d)
+		{
+			if ((d?.Count ?? 0) == 0)
+			{
+				return "";
+			}
+
+			var builder = new StringBuilder();
+
+			foreach (var kv in d)
+			{
+				builder.Append(kv.Key);
+				builder.Append('=');
+				builder.Append(kv.Value);
+				builder.Append('&');
+			}
+
+			builder.Remove(builder.Length - 1, 1);
+
+			return builder.ToString();
+		}
+
+		/// <summary>
+		/// Merges the source dictionary into the target dictionary. Any duplicate keys in the target will be overwritten.
+		/// </summary>
+		public static Dictionary<TKey, TValue> MergeInto<TKey, TValue>(this Dictionary<TKey, TValue> source, Dictionary<TKey, TValue> target)
+		{
+			if (source == null && target == null)
+			{
+				return null;
+			}
+
+			if (source == null && target != null)
+			{
+				return target;
+			}
+
+			if (source != null && target == null)
+			{
+				return source;
+			}
+
+			foreach (var kv in source)
+			{
+				target[kv.Key] = kv.Value;
+			}
+
+			return target;
 		}
 	}
 }

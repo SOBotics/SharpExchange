@@ -10,6 +10,8 @@ namespace StackExchange.Api.v22.Endpoints
 {
 	public static class Answers
 	{
+		private const string baseUrl = "https://api.stackexchange.com/2.2/";
+
 		public static Result<Answer[]> GetAll(QueryOptions options = null)
 		{
 			throw new NotImplementedException();
