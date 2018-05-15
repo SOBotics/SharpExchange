@@ -181,5 +181,12 @@ namespace StackExchange
 
 			return o;
 		}
+
+		public static string ToDelimitedList<T>(this IEnumerable<T> ids, string delmiter = ";")
+		{
+			return ids
+				.Select(x => x.ToString())
+				.Aggregate((a, b) => $"{a}{delmiter}{b}");
+		}
 	}
 }
