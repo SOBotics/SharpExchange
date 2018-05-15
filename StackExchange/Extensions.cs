@@ -3,6 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using StackExchange.Api.v22;
+using StackExchange.Api.v22.Endpoints;
 
 namespace StackExchange
 {
@@ -95,6 +97,21 @@ namespace StackExchange
 			}
 		}
 
+		public static void ThrowIfNullOrEmpty<T>(this IEnumerable<T> e, string argName)
+		{
+			argName.ThrowIfNullOrEmpty(nameof(argName));
+
+			if (e == null)
+			{
+				throw new ArgumentNullException(argName);
+			}
+
+			if (e.Count() == 0)
+			{
+				throw new ArgumentException($"'{argName}' cannot be empty.");
+			}
+		}
+
 		public static string ToQueryString(this Dictionary<string, string> d)
 		{
 			if ((d?.Count ?? 0) == 0)
@@ -143,6 +160,26 @@ namespace StackExchange
 			}
 
 			return target;
+		}
+
+		public static QueryOptions GetDefaultIfNull(this QueryOptions o)
+		{
+			if (o == null)
+			{
+				return new QueryOptions
+				{
+					Site = Constants.DefaultSite
+				};
+			}
+
+			if (string.IsNullOrEmpty(o.Site))
+			{
+				o.Site = Constants.DefaultSite;
+
+				return o;
+			}
+
+			return o;
 		}
 	}
 }

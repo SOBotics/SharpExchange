@@ -19,17 +19,7 @@ namespace StackExchange.Api.v22.Endpoints
 
 		public static async Task<Result<Answer[]>> GetAllAsync(QueryOptions options = null)
 		{
-			if (options == null)
-			{
-				options = new QueryOptions
-				{
-					Site = Constants.DefaultSite
-				};
-			}
-			else if (string.IsNullOrEmpty(options.Site))
-			{
-				options.Site = Constants.DefaultSite;
-			}
+			options = options.GetDefaultIfNull();
 
 			var url = $"{Constants.BaseApiUrl}/answers?{options.Query}";
 
@@ -47,9 +37,35 @@ namespace StackExchange.Api.v22.Endpoints
 			return JsonConvert.DeserializeObject<Result<Answer[]>>(result.Body);
 		}
 
-		public static Result<Answer[]> GetByIds(IEnumerable<int> ids, QueryOptions options = null)
+		public static Result<Answer[]> GetByIds(IEnumerable<int> ids, QueryOptions options)
 		{
-			throw new NotImplementedException();
+			return GetByIdsAsync(ids, options).Result;
+		}
+
+		public static async Task<Result<Answer[]>> GetByIdsAsync(IEnumerable<int> ids, QueryOptions options = null)
+		{
+			ids.ThrowIfNullOrEmpty(nameof(ids));
+
+			options = options.GetDefaultIfNull();
+
+			var idsStr = ids
+				.Select(x => x.ToString())
+				.Aggregate((a, b) => $"{a};{b}");
+
+			var url = $"{Constants.BaseApiUrl}/answers/{idsStr}?{options.Query}";
+
+			var result = await HttpRequest.GetWithStatusAsync(url);
+
+			if (string.IsNullOrEmpty(result.Body))
+			{
+				return new Result<Answer[]>
+				{
+					ErrorId = (int)result.Status,
+					ErrorName = result.Status.ToString()
+				};
+			}
+
+			return JsonConvert.DeserializeObject<Result<Answer[]>>(result.Body);
 		}
 
 		public static Result<Answer[]> GetByQuestionIds(IEnumerable<int> questionIds, QueryOptions options = null)
