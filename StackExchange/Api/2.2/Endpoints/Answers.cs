@@ -2,9 +2,7 @@
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using Newtonsoft.Json;
 using StackExchange.Api.V22.Types;
-using StackExchange.Net;
 
 namespace StackExchange.Api.V22.Endpoints
 {
@@ -19,9 +17,9 @@ namespace StackExchange.Api.V22.Endpoints
 		{
 			options = options.GetDefaultIfNull();
 
-			var url = $"{Constants.BaseApiUrl}/answers?{options.Query}";
+			var endpoint = $"{Constants.BaseApiUrl}/answers";
 
-			return await GetResultAsync(url);
+			return await ApiRequestScheduler.ScheduleRequestAsync<Answer[]>(endpoint, options);
 		}
 
 		public static Result<Answer[]> GetByIds(IEnumerable<int> ids, QueryOptions options)
@@ -35,9 +33,9 @@ namespace StackExchange.Api.V22.Endpoints
 			options = options.GetDefaultIfNull();
 
 			var idsStr = ids.ToDelimitedList();
-			var url = $"{Constants.BaseApiUrl}/answers/{idsStr}?{options.Query}";
+			var endpoint = $"{Constants.BaseApiUrl}/answers/{idsStr}";
 
-			return await GetResultAsync(url);
+			return await ApiRequestScheduler.ScheduleRequestAsync<Answer[]>(endpoint, options);
 		}
 
 		public static Result<Answer[]> GetByQuestionIds(IEnumerable<int> questionIds, QueryOptions options)
@@ -51,9 +49,9 @@ namespace StackExchange.Api.V22.Endpoints
 			options = options.GetDefaultIfNull();
 
 			var idsStr = questionIds.ToDelimitedList();
-			var url = $"{Constants.BaseApiUrl}/questions/{idsStr}/answers?{options.Query}";
+			var endpoint = $"{Constants.BaseApiUrl}/questions/{idsStr}/answers";
 
-			return await GetResultAsync(url);
+			return await ApiRequestScheduler.ScheduleRequestAsync<Answer[]>(endpoint, options);
 		}
 
 		public static Result<Answer[]> GetByUserIds(IEnumerable<int> userIds, QueryOptions options)
@@ -67,9 +65,9 @@ namespace StackExchange.Api.V22.Endpoints
 			options = options.GetDefaultIfNull();
 
 			var idsStr = userIds.ToDelimitedList();
-			var url = $"{Constants.BaseApiUrl}/users/{idsStr}/answers?{options.Query}";
+			var endpoint = $"{Constants.BaseApiUrl}/users/{idsStr}/answers";
 
-			return await GetResultAsync(url);
+			return await ApiRequestScheduler.ScheduleRequestAsync<Answer[]>(endpoint, options);
 		}
 
 		public static Result<Answer[]> GetTopAnswersByUserByTags(int userId, IEnumerable<string> tags, QueryOptions options = null)
@@ -85,27 +83,9 @@ namespace StackExchange.Api.V22.Endpoints
 			var tagList = tags
 				.Select(WebUtility.UrlEncode)
 				.ToDelimitedList();
-			var url = $"{Constants.BaseApiUrl}/users/{userId}/tags/{tagList}/top-answers?{options.Query}";
+			var endpoint = $"{Constants.BaseApiUrl}/users/{userId}/tags/{tagList}/top-answers";
 
-			return await GetResultAsync(url);
-		}
-
-
-
-		private static async Task<Result<Answer[]>> GetResultAsync(string url)
-		{
-			var result = await HttpRequest.GetWithStatusAsync(url);
-
-			if (string.IsNullOrEmpty(result.Body))
-			{
-				return new Result<Answer[]>
-				{
-					ErrorId = (int)result.Status,
-					ErrorName = result.Status.ToString()
-				};
-			}
-
-			return JsonConvert.DeserializeObject<Result<Answer[]>>(result.Body);
+			return await ApiRequestScheduler.ScheduleRequestAsync<Answer[]>(endpoint, options);
 		}
 	}
 }
