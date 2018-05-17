@@ -8,7 +8,7 @@ using StackExchange.Api.V22.Types;
 
 namespace StackExchange.Api.V22
 {
-	public static partial class ApiRequestScheduler
+	internal static partial class ApiRequestScheduler
 	{
 		private const string endpointCleanerPtn = @"(?:(2\.2/users)/\d+(/tags)/\S+?(/top-answers))|(?:(2\.2/tags)/\S+?(/(?:faq|info|related|synonyms|wikis|top-a(?:nswer|sk)ers))(?:/\S+)?)|(?:(2\.2/revisions)(?:/[\d;]+))";
 		private static readonly Dictionary<string, Sheduler> schedulers = new Dictionary<string, Sheduler>();
@@ -33,7 +33,9 @@ namespace StackExchange.Api.V22
 			return await schedulers[endpointId].ScheduleAsync<T>(fullUrl);
 		}
 
-		public static string GetEndpointId(string url)
+
+
+		private static string GetEndpointId(string url)
 		{
 			if (endpointCleaner.IsMatch(url))
 			{
@@ -55,12 +57,3 @@ namespace StackExchange.Api.V22
 		}
 	}
 }
-// /users/{id}/tags/{tags}/top-answers
-// /tags/{tags}/faq
-// /revisions/{ids}
-// /tags/{tags}/info
-// /tags/{tags}/related
-// /tags/{tag}/top-answerers/{period}
-// /tags/{tag}/top-askers/{period}
-// /tags/{tags}/synonyms
-// /tags/{tags}/wikis

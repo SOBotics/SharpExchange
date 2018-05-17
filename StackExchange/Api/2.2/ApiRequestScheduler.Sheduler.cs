@@ -11,7 +11,7 @@ using StackExchange.Net;
 
 namespace StackExchange.Api.V22
 {
-	public static partial class ApiRequestScheduler
+	internal static partial class ApiRequestScheduler
 	{
 		private class Sheduler
 		{
