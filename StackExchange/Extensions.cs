@@ -3,8 +3,8 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using StackExchange.Api.v22;
-using StackExchange.Api.v22.Endpoints;
+using StackExchange.Api.V22;
+using StackExchange.Api.V22.Endpoints;
 
 namespace StackExchange
 {

@@ -1,4 +1,4 @@
-﻿namespace StackExchange.Api.v22.Endpoints
+﻿namespace StackExchange.Api.V22.Endpoints
 {
 	internal abstract class Constants
 	{

@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Reflection;
 
-namespace StackExchange.Api.v22
+namespace StackExchange.Api.V22
 {
 	public class QueryOptions
 	{

@@ -1,6 +1,6 @@
 ﻿using System.Runtime.Serialization;
 
-namespace StackExchange.Api.v22.Types
+namespace StackExchange.Api.V22.Types
 {
 	public enum UserType
 	{

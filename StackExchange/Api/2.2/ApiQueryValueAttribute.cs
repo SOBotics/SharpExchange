@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace StackExchange.Api.v22
+namespace StackExchange.Api.V22
 {
 	internal class ApiQueryValueAttribute : Attribute
 	{

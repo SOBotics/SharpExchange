@@ -1,4 +1,4 @@
-﻿namespace StackExchange.Api.v22
+﻿namespace StackExchange.Api.V22
 {
 	public enum OrderBy
 	{

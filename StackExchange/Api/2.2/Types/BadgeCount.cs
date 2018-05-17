@@ -1,6 +1,6 @@
 ﻿using Newtonsoft.Json;
 
-namespace StackExchange.Api.v22.Types
+namespace StackExchange.Api.V22.Types
 {
 	public class BadgeCount
 	{

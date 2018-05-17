@@ -3,10 +3,10 @@ using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
-using StackExchange.Api.v22.Types;
+using StackExchange.Api.V22.Types;
 using StackExchange.Net;
 
-namespace StackExchange.Api.v22.Endpoints
+namespace StackExchange.Api.V22.Endpoints
 {
 	public static class Answers
 	{

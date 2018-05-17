@@ -2,7 +2,7 @@
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
 
-namespace StackExchange.Api.v22.Types
+namespace StackExchange.Api.V22.Types
 {
 	public class Comment
 	{
