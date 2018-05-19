@@ -33,6 +33,8 @@ namespace StackExchange.Chat
 
 		public bool IsGallery { get; private set; }
 
+		public bool IsFrozen { get; private set; }
+
 		public string Description { get; private set; }
 
 		public string[] Tags { get; private set; }
@@ -65,8 +67,9 @@ namespace StackExchange.Chat
 
 			Host = host;
 			Id = roomId;
-			Name = GetName(dom, out var isGallery);
-			IsGallery = isGallery;
+			Name = GetName(dom);
+			IsFrozen = GetFrozenStatus(dom);
+			IsGallery = GetGalleryStatus(dom);
 			Description = GetDescription(dom);
 			Tags = GetTags(dom);
 			FirstMessage = GetFirstMessage(dom);
@@ -114,7 +117,7 @@ namespace StackExchange.Chat
 
 
 
-		private string GetName(IHtmlDocument dom, out bool isGallery)
+		private string GetName(IHtmlDocument dom)
 		{
 			var name = dom
 				.QuerySelector(".roomcard-xxl h1")
@@ -126,11 +129,17 @@ namespace StackExchange.Chat
 				name = name.Remove(0, 1).Trim();
 			}
 
-			var galleryEl = dom.QuerySelector(".sprite-sec-gallery");
-
-			isGallery = galleryEl != null;
-
 			return name;
+		}
+
+		private bool GetGalleryStatus(IHtmlDocument dom)
+		{
+			return dom.QuerySelector(".sprite-sec-gallery") != null;
+		}
+
+		private bool GetFrozenStatus(IHtmlDocument dom)
+		{
+			return dom.QuerySelector(".frozen") != null;
 		}
 
 		private string GetDescription(IHtmlDocument dom)
