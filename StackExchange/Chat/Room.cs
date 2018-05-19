@@ -13,7 +13,11 @@ namespace StackExchange.Chat
 		{
 			public int Id { get; internal set; }
 
+			public int RoomId { get; internal set; }
+
 			public string Name { get; internal set; }
+
+			public int MessageCount { get; internal set; }
 
 			public override string ToString() => Name;
 		}
@@ -224,19 +228,19 @@ namespace StackExchange.Chat
 			return GetUsers(rooms);
 		}
 
-		private User[] GetUsers(IHtmlCollection<IElement> users)
+		private User[] GetUsers(IHtmlCollection<IElement> userElements)
 		{
-			if (users == null)
+			if (userElements == null)
 			{
 				return null;
 			}
 
-			var ids = new User[users.Length];
+			var users = new User[userElements.Length];
 
-			for (var i = 0; i < ids.Length; i++)
+			for (var i = 0; i < users.Length; i++)
 			{
-				var idStr = users[i].Id.Split('-').Last();
-				var name = users[i]
+				var idStr = userElements[i].Id.Split('-').Last();
+				var name = userElements[i]
 					.QuerySelector(".username")
 					?.TextContent;
 
@@ -245,14 +249,24 @@ namespace StackExchange.Chat
 					name = name.Substring(0, name.Length - 1).Trim();
 				}
 
-				ids[i] = new User
+				var msgCountStr = userElements[i]
+					.QuerySelector(".user-message-count")
+					?.Attributes["title"]
+					?.Value
+					.Split()[0];
+
+				int.TryParse(msgCountStr ?? "0", out var msgCount);
+
+				users[i] = new User
 				{
 					Id = int.Parse(idStr),
-					Name = name
+					RoomId = Id,
+					Name = name,
+					MessageCount = msgCount
 				};
 			}
 
-			return ids;
+			return users;
 		}
 	}
 }
