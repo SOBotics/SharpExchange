@@ -11,15 +11,15 @@ namespace StackExchange.Chat
 	{
 		public class User
 		{
-			public int Id { get; internal set; }
+			public int UserId { get; internal set; }
 
 			public int RoomId { get; internal set; }
 
-			public string Name { get; internal set; }
+			public string UserName { get; internal set; }
 
-			public int MessageCount { get; internal set; }
+			public int MessagesOwned { get; internal set; }
 
-			public override string ToString() => Name;
+			public override string ToString() => UserName;
 		}
 
 		private const string modChar = "♦";
@@ -31,9 +31,7 @@ namespace StackExchange.Chat
 
 		public string Name { get; private set; }
 
-		public bool IsGallery { get; private set; }
-
-		public bool IsFrozen { get; private set; }
+		public RoomStates States { get; private set; }
 
 		public string Description { get; private set; }
 
@@ -49,14 +47,23 @@ namespace StackExchange.Chat
 
 
 
-		public Room(string host, int roomId)
+		public Room(string host, int roomId, IAuthenticationProvider auth = null)
 		{
 			host.ThrowIfNullOrEmpty(nameof(host));
 
 			host = host.GetChatHost();
 
 			var url = string.Format(roomProfilePath, host, roomId);
-			var result = HttpRequest.GetWithStatus(url);
+			GetWithStatusResult result = null;
+
+			if (auth == null)
+			{
+				result = HttpRequest.GetWithStatus(url);
+			}
+			else
+			{
+				result = HttpRequest.GetWithStatus(url, auth[host]);
+			}
 
 			if (result.Status != System.Net.HttpStatusCode.OK)
 			{
@@ -68,8 +75,7 @@ namespace StackExchange.Chat
 			Host = host;
 			Id = roomId;
 			Name = GetName(dom);
-			IsFrozen = GetFrozenStatus(dom);
-			IsGallery = GetGalleryStatus(dom);
+			States = GetStates(dom);
 			Description = GetDescription(dom);
 			Tags = GetTags(dom);
 			FirstMessage = GetFirstMessage(dom);
@@ -132,14 +138,33 @@ namespace StackExchange.Chat
 			return name;
 		}
 
-		private bool GetGalleryStatus(IHtmlDocument dom)
+		private RoomStates GetStates(IHtmlDocument dom)
 		{
-			return dom.QuerySelector(".sprite-sec-gallery") != null;
-		}
+			var isPrivate = dom.QuerySelector(".sprite-sec-private") != null;
+			var isGallery = dom.QuerySelector(".sprite-sec-gallery") != null;
+			var isFrozen = dom.QuerySelector(".frozen") != null;
 
-		private bool GetFrozenStatus(IHtmlDocument dom)
-		{
-			return dom.QuerySelector(".frozen") != null;
+			RoomStates states;
+
+			if (isPrivate)
+			{
+				states = RoomStates.Private;
+			}
+			else if (isGallery)
+			{
+				states = RoomStates.Gallery;
+			}
+			else
+			{
+				states = RoomStates.Normal;
+			}
+
+			if (isFrozen)
+			{
+				states |= RoomStates.Frozen;
+			}
+
+			return states;
 		}
 
 		private string GetDescription(IHtmlDocument dom)
@@ -268,10 +293,10 @@ namespace StackExchange.Chat
 
 				users[i] = new User
 				{
-					Id = int.Parse(idStr),
+					UserId = int.Parse(idStr),
 					RoomId = Id,
-					Name = name,
-					MessageCount = msgCount
+					UserName = name,
+					MessagesOwned = msgCount
 				};
 			}
 
