@@ -12,24 +12,21 @@ namespace StackExchange.Chat
 	{
 		public class Revision
 		{
-			public string Text { get; private set; }
+			public string Text { get; internal set; }
 
-			public int AuthorId { get; private set; }
+			public int AuthorId { get; internal set; }
 
-			public string AuthorName { get; private set; }
+			public string AuthorName { get; internal set; }
 
 			// Good luck paring that.
-			public string Timestamp { get; private set; }
+			public string Timestamp { get; internal set; }
+		}
 
+		public class User
+		{
+			public int Id { get; internal set; }
 
-
-			internal Revision(string text, int authorId, string authorName, string timestamp)
-			{
-				Text = text;
-				AuthorId = authorId;
-				AuthorName = authorName;
-				Timestamp = timestamp;
-			}
+			public string Username { get; set; }
 		}
 
 		private const string messageTextUrl = "https://{0}/message/{1}?plain=true";
@@ -49,9 +46,7 @@ namespace StackExchange.Chat
 
 		public int Stars { get; private set; }
 
-		public bool IsPinned { get; private set; }
-
-		public int PinnedBy { get; private set; }
+		public User[] PinnedBy { get; private set; }
 
 		public ReadOnlyCollection<Revision> Revisions { get; private set; }
 
@@ -79,10 +74,11 @@ namespace StackExchange.Chat
 			var dom = new HtmlParser().Parse(html);
 
 			RoomId = GetRoomId(dom);
-			FetchHistory(dom);
-			Stars = GetStars(dom, out var pinnerId);
-			IsPinned = pinnerId != null;
-			PinnedBy = pinnerId ?? 0;
+			Stars = GetStars(dom);
+			PinnedBy = GetPinnedBy(dom);
+			Revisions = GetHistory(dom);
+			AuthorId = Revisions[0].AuthorId;
+			AuthorName = Revisions[0].AuthorName;
 		}
 
 
@@ -155,7 +151,58 @@ namespace StackExchange.Chat
 			return int.Parse(idStr);
 		}
 
-		private void FetchHistory(IHtmlDocument dom)
+		private int GetStars(IHtmlDocument dom)
+		{
+			var hasStars = dom.QuerySelector(".stars") != null;
+
+			if (!hasStars)
+			{
+				return 0;
+			}
+
+			var starCount = dom
+				.QuerySelector(".times")
+				?.TextContent;
+
+			if (string.IsNullOrEmpty(starCount))
+			{
+				starCount = "1";
+			}
+
+			return int.Parse(starCount);
+		}
+
+		private User[] GetPinnedBy(IHtmlDocument dom)
+		{
+			var pinnerLinks = dom.QuerySelectorAll("#content p a");
+
+			if ((pinnerLinks?.Length ?? 0) == 0)
+			{
+				return new User[0];
+			}
+
+			var users = new User[pinnerLinks.Length];
+
+			for (var i = 0; i < pinnerLinks.Length; i++)
+			{
+				var idStr = pinnerLinks[i]
+					.Attributes["href"]
+					?.Value
+					.Split('/')[2];
+				var id = int.TryParse(idStr, out var x) ? x : int.MinValue;
+				var name = pinnerLinks[i].TextContent;
+
+				users[i] = new User
+				{
+					Id = id,
+					Username = name
+				};
+			}
+
+			return users;
+		}
+
+		private ReadOnlyCollection<Revision> GetHistory(IHtmlDocument dom)
 		{
 			var monos = dom.QuerySelectorAll("#content h2:nth-of-type(2) ~ div");
 			var revs = new List<Revision>();
@@ -175,7 +222,13 @@ namespace StackExchange.Chat
 				var authorId = int.Parse(authorIdStr);
 				var timestamp = mono.QuerySelector(".timestamp").TextContent;
 
-				var r = new Revision(messageText, authorId, authorName, timestamp);
+				var r = new Revision
+				{
+					AuthorId = authorId,
+					AuthorName = authorName,
+					Text = messageText,
+					Timestamp = timestamp
+				};
 
 				if (revs.Count == 0)
 				{
@@ -187,43 +240,7 @@ namespace StackExchange.Chat
 				}
 			}
 
-			AuthorId = revs[0].AuthorId;
-			AuthorName = revs[0].AuthorName;
-			Revisions = new ReadOnlyCollection<Revision>(revs);
-		}
-
-		private int GetStars(IHtmlDocument dom, out int? pinnedBy)
-		{
-			var hasStars = dom.QuerySelector(".stars") != null;
-
-			pinnedBy = null;
-
-			if (!hasStars)
-			{
-				return 0;
-			}
-
-			var starCount = dom
-				.QuerySelector(".times")
-				?.TextContent;
-
-			if (string.IsNullOrEmpty(starCount))
-			{
-				starCount = "1";
-			}
-
-			var pinnedByStr = dom
-				.QuerySelector("#content p a")
-				?.Attributes["href"]
-				?.Value
-				.Split('/')[2];
-
-			if (int.TryParse(pinnedByStr, out var temp))
-			{
-				pinnedBy = temp;
-			}
-
-			return int.Parse(starCount);
+			return new ReadOnlyCollection<Revision>(revs);
 		}
 	}
 }

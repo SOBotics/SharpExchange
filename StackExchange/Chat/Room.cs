@@ -15,11 +15,11 @@ namespace StackExchange.Chat
 
 			public int RoomId { get; internal set; }
 
-			public string UserName { get; internal set; }
+			public string Username { get; internal set; }
 
 			public int MessagesOwned { get; internal set; }
 
-			public override string ToString() => UserName;
+			public override string ToString() => Username;
 		}
 
 		private const string modChar = "♦";
@@ -295,7 +295,7 @@ namespace StackExchange.Chat
 				{
 					UserId = int.Parse(idStr),
 					RoomId = Id,
-					UserName = name,
+					Username = name,
 					MessagesOwned = msgCount
 				};
 			}
