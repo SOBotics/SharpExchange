@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -10,11 +11,15 @@ namespace StackExchange.Chat
 	{
 		public class Room
 		{
-			public int Id { get; internal set; }
+			public int RoomId { get; internal set; }
 
-			public string Name { get; internal set; }
+			public string RoomName { get; internal set; }
 
-			public override string ToString() => Name;
+			public int UserId { get; internal set; }
+
+			public int MessagesOwned { get; set; }
+
+			public override string ToString() => RoomName;
 		}
 
 		private const string modChar = "♦";
@@ -28,13 +33,17 @@ namespace StackExchange.Chat
 
 		public bool IsModerator { get; private set; }
 
-		public DateTime AccountCreated { get; private set; }
+		public DateTime AccountCreatedOn { get; private set; }
 
-		public string Bio { get; private set; }
+		public string About { get; private set; }
 
 		public int Reputation { get; private set; }
 
 		public MessageCountStats MessageStats { get; private set; }
+
+		public int AllTimeMessages { get; private set; }
+
+		public int AllTimeRooms { get; private set; }
 
 		public Room[] Owns { get; private set; }
 
@@ -62,10 +71,12 @@ namespace StackExchange.Chat
 			Id = userId;
 			Username = GetUsername(dom, out var isMod);
 			IsModerator = isMod;
-			AccountCreated = GetAccountCreated(dom);
-			Bio = GetBio(dom);
+			AccountCreatedOn = GetAccountCreated(dom);
+			About = GetBio(dom);
 			Reputation = GetReputation(dom);
 			MessageStats = GetMessageStats(dom);
+			AllTimeMessages = GetAllTimeMessages(dom);
+			AllTimeRooms = GetAllTimeRooms(dom);
 			Owns = GetOwnedRooms(dom);
 			CurrentlyIn = GetCurrentlyInRooms(dom);
 		}
@@ -109,14 +120,19 @@ namespace StackExchange.Chat
 
 		public static User GetMe(IAuthenticationProvider auth, string host)
 		{
+			return GetMeAsync(auth, host).Result;
+		}
+
+		public static async Task<User> GetMeAsync(IAuthenticationProvider auth, string host)
+		{
 			auth.ThrowIfNull(nameof(auth));
 			host.ThrowIfNullOrEmpty(nameof(host));
 
 			host = host.GetChatHost();
 
 			var url = $"https://{host}/faq";
-			var html = HttpRequest.Get(url, auth[host]);
-			var dom = new HtmlParser().Parse(html);
+			var html = await HttpRequest.GetAsync(url, auth[host]);
+			var dom = await new HtmlParser().ParseAsync(html);
 			var idStr = dom
 				.QuerySelector(".topbar-menu-links a")
 				?.Attributes["href"]
@@ -235,6 +251,28 @@ namespace StackExchange.Chat
 			};
 		}
 
+		private int GetAllTimeMessages(IHtmlDocument dom)
+		{
+			var countStr = dom
+				.QuerySelector(".user-message-count-xxl")
+				?.TextContent;
+
+			return int.TryParse(countStr, out var count)
+				? count
+				: 0;
+		}
+
+		private int GetAllTimeRooms(IHtmlDocument dom)
+		{
+			var countStr = dom
+				.QuerySelector(".user-room-count-xxl")
+				?.TextContent;
+
+			return int.TryParse(countStr, out var count)
+				? count
+				: 0;
+		}
+
 		private Room[] GetOwnedRooms(IHtmlDocument dom)
 		{
 			var rooms = dom.QuerySelectorAll("#user-owningcards > div");
@@ -249,31 +287,41 @@ namespace StackExchange.Chat
 			return GetRooms(rooms);
 		}
 
-		private Room[] GetRooms(IHtmlCollection<IElement> rooms)
+		private Room[] GetRooms(IHtmlCollection<IElement> roomElements)
 		{
-			if (rooms == null)
+			if (roomElements == null)
 			{
 				return null;
 			}
 
-			var ids = new Room[rooms.Length];
+			var rooms = new Room[roomElements.Length];
 
-			for (var i = 0; i < ids.Length; i++)
+			for (var i = 0; i < rooms.Length; i++)
 			{
-				var idStr = rooms[i].Id.Remove(0, 5);
-				var name = rooms[i]
+				var idStr = roomElements[i].Id.Remove(0, 5);
+				var name = roomElements[i]
 					.QuerySelector(".room-name")
 					?.Attributes["title"]
 					?.Value;
 
-				ids[i] = new Room
+				var msgCountStr = roomElements[i]
+					.QuerySelector(".room-message-count")
+					?.Attributes["title"]
+					?.Value
+					.Split()[0];
+
+				int.TryParse(msgCountStr ?? "0", out var msgCount);
+
+				rooms[i] = new Room
 				{
-					Id = int.Parse(idStr),
-					Name = name
+					RoomId = int.Parse(idStr),
+					UserId = Id,
+					RoomName = name,
+					MessagesOwned = msgCount
 				};
 			}
 
-			return ids;
+			return rooms;
 		}
 	}
 }
