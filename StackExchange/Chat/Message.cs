@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 using AngleSharp.Dom.Html;
@@ -49,6 +50,8 @@ namespace StackExchange.Chat
 
 		public User[] PinnedBy { get; private set; }
 
+		public MessageStates States { get; private set; }
+
 		public ReadOnlyCollection<Revision> Revisions { get; private set; }
 
 
@@ -63,12 +66,14 @@ namespace StackExchange.Chat
 			Host = host.GetChatHost();
 			Id = messageId;
 
-			Text = GetTextWithStatus(Host, Id, cMan, out var status);
+			var result = GetTextWithStatusAsync(Host, Id, auth).Result;
 
-			if (status != HttpStatusCode.OK)
+			if (result.Status != HttpStatusCode.OK)
 			{
-				throw new Exception($"Unable to fetch message {Id}: {status}.");
+				throw new Exception($"Unable to fetch message {Id}: {result.Status}.");
 			}
+
+			Text = result.Body;
 
 			var endpoint = $"https://{Host}/messages/{Id}/history";
 			var html = HttpRequest.Get(endpoint, cMan);
@@ -78,6 +83,7 @@ namespace StackExchange.Chat
 			Stars = GetStars(dom);
 			PinnedBy = GetPinnedBy(dom);
 			Revisions = GetHistory(dom);
+			States = GetStates(dom); // Must be last, manipulates dom
 			AuthorId = Revisions[0].AuthorId;
 			AuthorName = Revisions[0].AuthorName;
 		}
@@ -222,6 +228,37 @@ namespace StackExchange.Chat
 			}
 
 			return users;
+		}
+
+		private MessageStates GetStates(IHtmlDocument dom)
+		{
+			var isEdited = Revisions.Count > 1;
+			var isStarred = Stars > 0;
+			var isPinned = PinnedBy.Length > 0;
+			var isDeleted = dom
+				.QuerySelectorAll(".monologue b")
+				.Any(x => x.TextContent == "deleted");
+
+			var content = dom.QuerySelector("#content");
+			var childCount = content.Children.Length;
+
+			for (var i = 0; i < childCount; i++)
+			{
+				content.RemoveChild(content.Children[0]);
+			}
+
+			var isPuregd = content.TextContent.Trim() == "(older data no longer available)";
+
+			var states = isDeleted
+				? MessageStates.Deleted
+				: MessageStates.PubliclyVisible;
+
+			if (isEdited) states = MessageStates.Edited;
+			if (isStarred) states |= MessageStates.Starred;
+			if (isPinned) states |= MessageStates.Pinned;
+			if (isPuregd) states |= MessageStates.Purged;
+
+			return states;
 		}
 
 		private ReadOnlyCollection<Revision> GetHistory(IHtmlDocument dom)
