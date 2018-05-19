@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Net;
+using System.Threading.Tasks;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using StackExchange.Net;
@@ -118,28 +119,49 @@ namespace StackExchange.Chat
 
 		public override string ToString() => Text;
 
-		public static bool Exists(string host, int messageId, CookieManager cookieManager = null)
+		public static bool Exists(string host, int messageId, IAuthenticationProvider auth = null)
 		{
-			GetTextWithStatus(host, messageId, cookieManager, out var status);
-
-			return status == HttpStatusCode.OK;
+			return ExistsAsync(host, messageId, auth).Result;
 		}
 
-		public static string GetText(string host, int messageId, CookieManager cookieManager = null)
+		public static async Task<bool> ExistsAsync(string host, int messageId, IAuthenticationProvider auth = null)
 		{
-			return GetTextWithStatus(host, messageId, cookieManager, out var status);
+			var result = await GetTextWithStatusAsync(host, messageId, auth);
+
+			return result.Status == HttpStatusCode.OK;
+		}
+
+		public static string GetText(string host, int messageId, IAuthenticationProvider auth = null)
+		{
+			return GetTextAsync(host, messageId, auth).Result;
+		}
+
+		public static async Task<string> GetTextAsync(string host, int messageId, IAuthenticationProvider auth = null)
+		{
+			var result = await GetTextWithStatusAsync(host, messageId, auth);
+
+			return result.Status == HttpStatusCode.OK
+				? result.Body
+				: null;
 		}
 
 
 
-		private static string GetTextWithStatus(string host, int messageId, CookieManager cookieManager, out HttpStatusCode status)
+		private static async Task<GetWithStatusResult> GetTextWithStatusAsync(string host, int messageId, IAuthenticationProvider auth = null)
 		{
-			var endpoint = string.Format(messageTextUrl, host.GetChatHost(), messageId);
-			var result = HttpRequest.GetWithStatus(endpoint, cookieManager);
+			var url = string.Format(messageTextUrl, host.GetChatHost(), messageId);
+			GetWithStatusResult result = null;
 
-			status = result.Status;
+			if (auth == null)
+			{
+				result = await HttpRequest.GetWithStatusAsync(url);
+			}
+			else
+			{
+				result = await HttpRequest.GetWithStatusAsync(url, auth[host]);
+			}
 
-			return result.Status == HttpStatusCode.OK ? result.Body : null;
+			return result;
 		}
 
 		private int GetRoomId(IHtmlDocument dom)
