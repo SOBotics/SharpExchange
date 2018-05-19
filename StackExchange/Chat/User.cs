@@ -51,14 +51,23 @@ namespace StackExchange.Chat
 
 
 
-		public User(string host, int userId)
+		public User(string host, int userId, IAuthenticationProvider auth = null)
 		{
 			host.ThrowIfNullOrEmpty(nameof(host));
 
 			host = host.GetChatHost();
 
 			var url = string.Format(userProfilePath, host, userId);
-			var result = HttpRequest.GetWithStatus(url);
+			GetWithStatusResult result = null;
+
+			if (auth == null)
+			{
+				result = HttpRequest.GetWithStatus(url);
+			}
+			else
+			{
+				result = HttpRequest.GetWithStatus(url, auth[host]);
+			}
 
 			if (result.Status != System.Net.HttpStatusCode.OK)
 			{
