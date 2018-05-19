@@ -21,7 +21,7 @@ namespace StackExchange.Api.V22.Endpoints
 		/// </summary>
 		public static async Task<Result<Badge[]>> GetAllAsync(QueryOptions options = null)
 		{
-
+			throw new NotImplementedException();
 		}
 
 		/// <summary>
@@ -39,7 +39,7 @@ namespace StackExchange.Api.V22.Endpoints
 		/// </summary>
 		public static async Task<Result<Badge[]>> GetByNameAsync(string name, QueryOptions options = null)
 		{
-
+			throw new NotImplementedException();
 		}
 
 
