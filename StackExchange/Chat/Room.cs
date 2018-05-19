@@ -144,7 +144,7 @@ namespace StackExchange.Chat
 			var isGallery = dom.QuerySelector(".sprite-sec-gallery") != null;
 			var isFrozen = dom.QuerySelector(".frozen") != null;
 
-			RoomStates states;
+			var states = RoomStates.None;
 
 			if (isPrivate)
 			{
