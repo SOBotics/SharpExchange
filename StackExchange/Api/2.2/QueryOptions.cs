@@ -31,6 +31,12 @@ namespace StackExchange.Api.V22
 		[ApiQueryValue("pagesize")]
 		public int? PageSize { get; set; }
 
+		[ApiQueryValue("fromdate")]
+		public DateTime? FromData { get; set; }
+
+		[ApiQueryValue("todate")]
+		public DateTime? ToDate { get; set; }
+
 		/// <summary>
 		/// Defines which field Min/Max (and Order) apply to.
 		/// </summary>
@@ -58,19 +64,6 @@ namespace StackExchange.Api.V22
 		/// </summary>
 		[ApiQueryValue("max")]
 		public int? Max { get; set; }
-
-		//TODO: Add ref to question type when implemented
-		/// <summary>
-		/// Defines the start of a range to apply to the CreationDate field.
-		/// </summary>
-		[ApiQueryValue("fromdate")]
-		public DateTime? FromData { get; set; }
-
-		/// <summary>
-		/// Defines the end of a range to apply to the CreationDate field.
-		/// </summary>
-		[ApiQueryValue("todate")]
-		public DateTime? ToDate { get; set; }
 
 		/// <summary>
 		/// Allows the caller to specify custom fields that
