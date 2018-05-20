@@ -78,10 +78,22 @@ namespace StackExchange.Chat.Actions
 			GC.SuppressFinalize(this);
 		}
 
-		public object ScheduleAction(ChatAction act) => ScheduleAction(act, Timeout.InfiniteTimeSpan);
+		public object ScheduleAction(ChatAction act)
+		{
+			return ScheduleAction(act, Timeout.InfiniteTimeSpan);
+		}
 
-		//TODO: Perform permissions check before scheduling action for execution.
+		public async Task<object> ScheduleActionAsync(ChatAction act)
+		{
+			return await ScheduleActionAsync(act, Timeout.InfiniteTimeSpan);
+		}
+
 		public object ScheduleAction(ChatAction act, TimeSpan timeout)
+		{
+			return ScheduleActionAsync(act, timeout).Result;
+		}
+
+		public async Task<object> ScheduleActionAsync(ChatAction act, TimeSpan timeout)
 		{
 			act.ThrowIfNull(nameof(act));
 
@@ -97,7 +109,8 @@ namespace StackExchange.Chat.Actions
 			actionQueue.Enqueue(act);
 
 			queueMre.Set();
-			wait.WaitOne(timeout);
+
+			await Task.Run(() => wait.WaitOne(timeout));
 
 			return data;
 		}
