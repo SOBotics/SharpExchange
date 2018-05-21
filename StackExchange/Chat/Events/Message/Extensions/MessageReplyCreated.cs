@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events.Message.Extensions
 {
 	public static partial class Extensions
 	{
-		public static MessageReplyCreated AddMessageReplyCreatedEventHandler<T>(this RoomWatcher<T> rw, Action<MessageReply> callback) where T : IWebSocket
+		public static MessageReplyCreated AddMessageReplyCreatedEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<MessageReply> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -18,7 +22,10 @@ namespace StackExchange.Chat.Events.Message.Extensions
 			return eventProcessor;
 		}
 
-		public static MessageReplyCreated AddMessageReplyCreatedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.User, Chat.Message, Chat.Message> callback) where T : IWebSocket
+		public static MessageReplyCreated AddMessageReplyCreatedEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<Chat.User, Chat.Message, Chat.Message> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -26,9 +33,27 @@ namespace StackExchange.Chat.Events.Message.Extensions
 
 			eventProcessor.OnEvent += mr =>
 			{
-				var author = new Chat.User(rw.Host, mr.AuthorId);
-				var message = new Chat.Message(rw.Host, mr.MessageId, rw.Auth);
-				var targetMsg = new Chat.Message(rw.Host, mr.TargetMessageId, rw.Auth);
+				Chat.User author = null;
+				Chat.Message message = null;
+				Chat.Message targetMsg = null;
+
+				var tasks = new[]
+				{
+					Task.Run(() =>
+					{
+						author = new Chat.User(rw.Host, mr.AuthorId, rw.Auth);
+					}),
+					Task.Run(() =>
+					{
+						message = new Chat.Message(rw.Host, mr.MessageId, rw.Auth);
+					}),
+					Task.Run(() =>
+					{
+						targetMsg = new Chat.Message(rw.Host, mr.TargetMessageId, rw.Auth);
+					})
+				};
+
+				Task.WhenAll(tasks).Wait();
 
 				callback(author, message, targetMsg);
 			};

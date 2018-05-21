@@ -5,7 +5,10 @@ namespace StackExchange.Chat.Events.Message.Extensions
 {
 	public static partial class Extensions
 	{
-		public static MessageDeleted AddMessageDeletedEventHandler<T>(this RoomWatcher<T> rw, Action<DeletedMessage> callback) where T : IWebSocket
+		public static MessageDeleted AddMessageDeletedEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<DeletedMessage> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -18,7 +21,10 @@ namespace StackExchange.Chat.Events.Message.Extensions
 			return eventProcessor;
 		}
 
-		public static MessageDeleted AddMessageDeletedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.User, int> callback) where T : IWebSocket
+		public static MessageDeleted AddMessageDeletedEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<Chat.User, int> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -26,7 +32,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 
 			eventProcessor.OnEvent += md =>
 			{
-				var deletedBy = new Chat.User(rw.Host, md.DeletedBy);
+				var deletedBy = new Chat.User(rw.Host, md.DeletedBy, rw.Auth);
 
 				callback(deletedBy, md.MessageId);
 			};

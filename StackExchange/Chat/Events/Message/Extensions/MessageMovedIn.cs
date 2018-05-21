@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events.Message.Extensions
@@ -26,8 +27,22 @@ namespace StackExchange.Chat.Events.Message.Extensions
 
 			eventProcessor.OnEvent += mm =>
 			{
-				var movedBy = new Chat.User(rw.Host, mm.MovedBy);
-				var message = new Chat.Message(rw.Host, mm.MessageId, rw.Auth);
+				Chat.User movedBy = null;
+				Chat.Message message = null;
+
+				var tasks = new[]
+				{
+					Task.Run(() =>
+					{
+						movedBy = new Chat.User(rw.Host, mm.MovedBy, rw.Auth);
+					}),
+					Task.Run(() =>
+					{
+						message = new Chat.Message(rw.Host, mm.MessageId, rw.Auth);
+					})
+				};
+
+				Task.WhenAll(tasks).Wait();
 
 				callback(movedBy, message);
 			};

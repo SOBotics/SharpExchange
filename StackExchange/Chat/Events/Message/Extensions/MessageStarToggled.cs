@@ -5,7 +5,10 @@ namespace StackExchange.Chat.Events.Message.Extensions
 {
 	public static partial class Extensions
 	{
-		public static MessageStarToggled AddMessageStarToggledEventHandler<T>(this RoomWatcher<T> rw, Action<MessageStars> callback) where T : IWebSocket
+		public static MessageStarToggled AddMessageStarToggledEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<MessageStars> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -18,7 +21,10 @@ namespace StackExchange.Chat.Events.Message.Extensions
 			return eventProcessor;
 		}
 
-		public static MessageStarToggled AddMessageStarToggledEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Message> callback) where T : IWebSocket
+		public static MessageStarToggled AddMessageStarToggledEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<Chat.Message> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
