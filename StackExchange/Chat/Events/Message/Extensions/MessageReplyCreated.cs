@@ -53,7 +53,7 @@ namespace StackExchange.Chat.Events.Message.Extensions
 					})
 				};
 
-				Task.WhenAll(tasks).Wait();
+				Task.WaitAll(tasks);
 
 				callback(author, message, targetMsg);
 			};
