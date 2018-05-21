@@ -62,11 +62,11 @@ namespace StackExchange.Chat
 
 			if (auth == null)
 			{
-				result = HttpRequest.GetWithStatus(url);
+				result = HttpRequest.GetWithStatusAsync(url).Result;
 			}
 			else
 			{
-				result = HttpRequest.GetWithStatus(url, auth[host]);
+				result = HttpRequest.GetWithStatusAsync(url, auth[host]).Result;
 			}
 
 			if (result.Status != System.Net.HttpStatusCode.OK)
@@ -127,11 +127,6 @@ namespace StackExchange.Chat
 
 		public override string ToString() => Username;
 
-		public static User GetMe(IAuthenticationProvider auth, string host)
-		{
-			return GetMeAsync(auth, host).Result;
-		}
-
 		public static async Task<User> GetMeAsync(IAuthenticationProvider auth, string host)
 		{
 			auth.ThrowIfNull(nameof(auth));
@@ -159,6 +154,11 @@ namespace StackExchange.Chat
 			}
 
 			return new User(host, id);
+		}
+
+		public static Task<User> GetAsync(string host, int userId, IAuthenticationProvider auth = null)
+		{
+			return Task.Run(() => new User(host, userId, auth));
 		}
 
 

@@ -98,7 +98,7 @@ namespace StackExchange.Api.V22
 					if (reqs.Count == 0) continue;
 
 					var req = reqs.Dequeue();
-					var json = HttpRequest.Get(req.Url);
+					var json = HttpRequest.GetAsync(req.Url).Result;
 					var responseBackoff = 0.0;
 
 					try

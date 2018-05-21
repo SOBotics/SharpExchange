@@ -31,11 +31,6 @@ namespace StackExchange.Net
 
 
 
-		public static GetWithStatusResult GetWithStatus(string endpoint, CookieManager cMan = null)
-		{
-			return GetWithStatusAsync(endpoint, cMan).Result;
-		}
-
 		public static async Task<GetWithStatusResult> GetWithStatusAsync(string endpoint, CookieManager cMan = null)
 		{
 			var response = await new HttpRequest
@@ -46,11 +41,6 @@ namespace StackExchange.Net
 			}.SendAsync();
 
 			return new GetWithStatusResult(response.Content, response.StatusCode);
-		}
-
-		public static string Get(string endpoint, CookieManager cookies = null)
-		{
-			return GetAsync(endpoint, cookies).Result;
 		}
 
 		public static async Task<string> GetAsync(string endpoint, CookieManager cookies = null)
@@ -64,8 +54,6 @@ namespace StackExchange.Net
 
 			return r.Content;
 		}
-
-		public RestResponse Send() => SendAsync().Result;
 
 		public async Task<RestResponse> SendAsync()
 		{

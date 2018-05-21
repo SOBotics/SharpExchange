@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StackExchange.Chat.Actions.Message;
 using StackExchange.Chat.Actions.Room;
 using StackExchange.Chat.Actions.User;
@@ -7,154 +8,144 @@ namespace StackExchange.Chat.Actions
 {
 	public static class Extenions
 	{
-		public static int CreateMessage(this ActionScheduler actionScheduler, string message)
+		#region Message extensions
+
+		public static Task<int> CreateMessageAsync(this ActionScheduler actionScheduler, string message)
 		{
 			message.ThrowIfNullOrEmpty(nameof(message));
 
 			var action = new MessageCreator(message);
 
-			return (int)actionScheduler.ScheduleAction(action);
+			return actionScheduler.ScheduleActionAsync<int>(action);
 		}
 
-		public static int CreatePing(this ActionScheduler actionScheduler, string message, int userId)
+		public static Task<int> CreatePingAsync(this ActionScheduler actionScheduler, string message, int userId)
 		{
+			message.ThrowIfNullOrEmpty(nameof(message));
+
 			var userToPing = new Chat.User(actionScheduler.Host, userId);
 
-			return CreatePing(actionScheduler, message, userToPing);
+			return CreatePingAsync(actionScheduler, message, userToPing.Username);
 		}
 
-		public static int CreatePing(this ActionScheduler actionScheduler, string message, Chat.User userToPing)
+		public static Task<int> CreatePingAsync(this ActionScheduler actionScheduler, string message, Chat.User userToPing)
 		{
-			var name = userToPing.Username.Replace(" ", "").Trim();
+			message.ThrowIfNullOrEmpty(nameof(message));
+			userToPing.ThrowIfNull(nameof(userToPing));
+
+			return CreatePingAsync(actionScheduler, message, userToPing.Username);
+		}
+
+		public static Task<int> CreatePingAsync(this ActionScheduler actionScheduler, string message, string username)
+		{
+			message.ThrowIfNullOrEmpty(nameof(message));
+			username.ThrowIfNullOrEmpty(nameof(username));
+
+			var name = username.Replace(" ", "").Trim();
 			var txt = $"@{name} {message}";
 
-			return CreateMessage(actionScheduler, txt);
+			return CreateMessageAsync(actionScheduler, txt);
 		}
 
-		public static int CreateReply(this ActionScheduler actionScheduler, string message, Chat.Message messageToReplyTo)
+		public static Task<int> CreateReplyAsync(this ActionScheduler actionScheduler, string message, Chat.Message messageToReplyTo)
 		{
-			return CreateReply(actionScheduler, message, messageToReplyTo.Id);
+			message.ThrowIfNullOrEmpty(nameof(message));
+			messageToReplyTo.ThrowIfNull(nameof(messageToReplyTo));
+
+			return CreateReplyAsync(actionScheduler, message, messageToReplyTo.Id);
 		}
 
-		public static int CreateReply(this ActionScheduler actionScheduler, string message, int messageId)
+		public static Task<int> CreateReplyAsync(this ActionScheduler actionScheduler, string message, int messageId)
 		{
+			message.ThrowIfNullOrEmpty(nameof(message));
+
 			var txt = $":{messageId} {message}";
 
-			return CreateMessage(actionScheduler, txt);
+			return CreateMessageAsync(actionScheduler, txt);
 		}
 
-		public static bool DeleteMessage(this ActionScheduler actionScheduler, int messageId)
-		{
-			if (messageId < 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(messageId));
-			}
-
-			var action = new MessageDeleter(messageId);
-
-			return (bool)actionScheduler.ScheduleAction(action);
-		}
-
-		public static bool DeleteMessage(this ActionScheduler actionScheduler, Chat.Message message)
+		public static Task<bool> DeleteMessageAsync(this ActionScheduler actionScheduler, Chat.Message message)
 		{
 			message.ThrowIfNull(nameof(message));
 
-			return DeleteMessage(actionScheduler, message.Id);
+			return DeleteMessageAsync(actionScheduler, message.Id);
 		}
 
-		public static bool EditMessage(this ActionScheduler actionScheduler, int messageId, string newText)
+		public static Task<bool> DeleteMessageAsync(this ActionScheduler actionScheduler, int messageId)
 		{
-			if (messageId < 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(messageId));
-			}
+			var action = new MessageDeleter(messageId);
 
+			return actionScheduler.ScheduleActionAsync<bool>(action);
+		}
+
+		public static Task<bool> EditMessageAsync(this ActionScheduler actionScheduler, Chat.Message message, string newText)
+		{
+			message.ThrowIfNull(nameof(message));
+			newText.ThrowIfNullOrEmpty(nameof(newText));
+
+			return EditMessageAsync(actionScheduler, message.Id, newText);
+		}
+
+		public static Task<bool> EditMessageAsync(this ActionScheduler actionScheduler, int messageId, string newText)
+		{
 			newText.ThrowIfNullOrEmpty(nameof(newText));
 
 			var action = new MessageEditor(messageId, newText);
 
-			return (bool)actionScheduler.ScheduleAction(action);
+			return actionScheduler.ScheduleActionAsync<bool>(action);
 		}
 
-		public static bool EditMessage(this ActionScheduler actionScheduler, Chat.Message message, string newText)
+		#endregion
+
+		#region Star/pin extensions
+
+		public static Task<bool> TogglePinAsync(this ActionScheduler actionScheduler, Chat.Message message)
 		{
 			message.ThrowIfNull(nameof(message));
 
-			return EditMessage(actionScheduler, message.Id, newText);
+			return TogglePinAsync(actionScheduler, message.Id);
 		}
 
-		public static bool TogglePin(this ActionScheduler actionScheduler, int messageId)
+		public static Task<bool> TogglePinAsync(this ActionScheduler actionScheduler, int messageId)
 		{
-			if (messageId < 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(messageId));
-			}
-
 			var action = new MessagePinToggler(messageId);
 
-			return (bool)actionScheduler.ScheduleAction(action);
+			return actionScheduler.ScheduleActionAsync<bool>(action);
 		}
 
-		public static bool TogglePin(this ActionScheduler actionScheduler, Chat.Message message)
+		public static Task<bool> ClearStarsAsync(this ActionScheduler actionScheduler, Chat.Message message)
 		{
 			message.ThrowIfNull(nameof(message));
 
-			return TogglePin(actionScheduler, message.Id);
+			return ClearStarsAsync(actionScheduler, message.Id);
 		}
 
-		public static bool ClearStars(this ActionScheduler actionScheduler, int messageId)
+		public static Task<bool> ClearStarsAsync(this ActionScheduler actionScheduler, int messageId)
 		{
-			if (messageId < 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(messageId));
-			}
-
 			var action = new MessageStarsClearer(messageId);
 
-			return (bool)actionScheduler.ScheduleAction(action);
+			return actionScheduler.ScheduleActionAsync<bool>(action);
 		}
 
-		public static bool ClearStars(this ActionScheduler actionScheduler, Chat.Message message)
+		public static Task<bool> ToggleStarAsync(this ActionScheduler actionScheduler, Chat.Message message)
 		{
 			message.ThrowIfNull(nameof(message));
 
-			return ClearStars(actionScheduler, message.Id);
+			return ToggleStarAsync(actionScheduler, message.Id);
 		}
 
-		public static bool ToggleStar(this ActionScheduler actionScheduler, int messageId)
+		public static Task<bool> ToggleStarAsync(this ActionScheduler actionScheduler, int messageId)
 		{
-			if (messageId < 0)
-			{
-				throw new ArgumentOutOfRangeException(nameof(messageId));
-			}
-
 			var action = new MessageStarToggler(messageId);
 
-			return (bool)actionScheduler.ScheduleAction(action);
+			return actionScheduler.ScheduleActionAsync<bool>(action);
 		}
 
-		public static bool ToggleStar(this ActionScheduler actionScheduler, Chat.Message message)
-		{
-			message.ThrowIfNull(nameof(message));
+		#endregion
 
-			return ToggleStar(actionScheduler, message.Id);
-		}
+		#region Misc room owner actions extensions
 
-		public static bool TimeoutRoom(this ActionScheduler actionScheduler, int durationSeconds, string reason)
-		{
-			if (durationSeconds < 5)
-			{
-				throw new ArgumentOutOfRangeException(nameof(durationSeconds), "Must be more than or equal to 5.");
-			}
-
-			reason.ThrowIfNullOrEmpty(nameof(reason));
-
-			var action = new RoomTimeout(durationSeconds, reason);
-
-			return (bool)actionScheduler.ScheduleAction(action);
-		}
-
-		public static bool TimeoutRoom(this ActionScheduler actionScheduler, TimeSpan duration, string reason)
+		public static Task<bool> TimeoutRoomAsync(this ActionScheduler actionScheduler, TimeSpan duration, string reason)
 		{
 			var seconds = (int)Math.Round(duration.TotalSeconds);
 
@@ -165,35 +156,51 @@ namespace StackExchange.Chat.Actions
 
 			reason.ThrowIfNullOrEmpty(nameof(reason));
 
-			return TimeoutRoom(actionScheduler, seconds, reason);
+			return TimeoutRoomAsync(actionScheduler, seconds, reason);
 		}
 
-		public static void ChangeUserAccessLevel(this ActionScheduler actionScheduler, int userId, UserAccessLevel newLevel)
+		public static Task<bool> TimeoutRoomAsync(this ActionScheduler actionScheduler, int durationSeconds, string reason)
+		{
+			if (durationSeconds < 5)
+			{
+				throw new ArgumentOutOfRangeException(nameof(durationSeconds), "Must be more than or equal to 5.");
+			}
+
+			reason.ThrowIfNullOrEmpty(nameof(reason));
+
+			var action = new RoomTimeout(durationSeconds, reason);
+
+			return actionScheduler.ScheduleActionAsync<bool>(action);
+		}
+
+		public static Task ChangeUserAccessLevelAsync(this ActionScheduler actionScheduler, Chat.User user, UserAccessLevel newLevel)
+		{
+			user.ThrowIfNull(nameof(user));
+
+			return ChangeUserAccessLevelAsync(actionScheduler, user.Id, newLevel);
+		}
+
+		public static Task ChangeUserAccessLevelAsync(this ActionScheduler actionScheduler, int userId, UserAccessLevel newLevel)
 		{
 			var action = new UserAccessLevelEditor(userId, newLevel);
 
-			actionScheduler.ScheduleAction(action);
+			return actionScheduler.ScheduleActionAsync<bool>(action);
 		}
 
-		public static void ChangeUserAccessLevel(this ActionScheduler actionScheduler, Chat.User user, UserAccessLevel newLevel)
+		public static Task<bool> KickMuteUser(this ActionScheduler actionScheduler, Chat.User user)
 		{
 			user.ThrowIfNull(nameof(user));
 
-			ChangeUserAccessLevel(actionScheduler, user.Id, newLevel);
+			return KickMuteUserAsync(actionScheduler, user.Id);
 		}
 
-		public static bool KickMuteUser(this ActionScheduler actionScheduler, int userId)
+		public static Task<bool> KickMuteUserAsync(this ActionScheduler actionScheduler, int userId)
 		{
 			var action = new UserKickMuter(userId);
 
-			return (bool)actionScheduler.ScheduleAction(action);
+			return actionScheduler.ScheduleActionAsync<bool>(action);
 		}
 
-		public static bool KickMuteUser(this ActionScheduler actionScheduler, Chat.User user)
-		{
-			user.ThrowIfNull(nameof(user));
-
-			return KickMuteUser(actionScheduler, user.Id);
-		}
+		#endregion
 	}
 }

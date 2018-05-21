@@ -18,7 +18,7 @@ namespace StackExchange.Api.V22
 
 
 
-		public static async Task<Result<T>> ScheduleRequestAsync<T>(string endpoint, QueryOptions options = null)
+		public static Task<Result<T>> ScheduleRequestAsync<T>(string endpoint, QueryOptions options = null)
 		{
 			endpoint.ThrowIfNullOrEmpty(nameof(endpoint));
 
@@ -30,7 +30,7 @@ namespace StackExchange.Api.V22
 				schedulers[endpointId] = new Sheduler();
 			}
 
-			return await schedulers[endpointId].ScheduleAsync<T>(fullUrl);
+			return schedulers[endpointId].ScheduleAsync<T>(fullUrl);
 		}
 
 

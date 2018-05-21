@@ -98,19 +98,20 @@ namespace StackExchange.Chat.Events
 
 			if ((DateTime.UtcNow - lastReconnectFailure).TotalSeconds < reconnectWait * 2)
 			{
-				reconnectWait += 5;
+				reconnectWait += 10;
 
-				reconnectWait = Math.Min(reconnectWait, 60);
+				reconnectWait = Math.Min(reconnectWait, 100);
 			}
 			else
 			{
-				reconnectWait = 5;
+				reconnectWait = 10;
 			}
 
 			lastReconnectFailure = DateTime.UtcNow;
 
 			Thread.Sleep(reconnectWait * 1000);
 
+			FKeyAccessor.ClearCache();
 			Auth.InvalidateHostCache(Host);
 
 			WebSocket = GetWebSocket();
@@ -136,9 +137,9 @@ namespace StackExchange.Chat.Events
 				Data = new Dictionary<string, object>
 				{
 					["roomid"] = RoomId,
-					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", Auth[Host])
+					["fkey"] = FKeyAccessor.GetAsync($"https://{Host}/rooms/{RoomId}", Auth[Host])
 				}
-			}.Send();
+			}.SendAsync().Result;
 
 			if (response.StatusCode != System.Net.HttpStatusCode.OK)
 			{
@@ -161,9 +162,9 @@ namespace StackExchange.Chat.Events
 				{
 					["mode"] = "events",
 					["msgCount"] = 0,
-					["fkey"] = FKeyAccessor.Get($"https://{Host}/rooms/{RoomId}", Auth[Host])
+					["fkey"] = FKeyAccessor.GetAsync($"https://{Host}/rooms/{RoomId}", Auth[Host])
 				}
-			}.Send();
+			}.SendAsync().Result;
 
 			if (response.StatusCode != System.Net.HttpStatusCode.OK)
 			{

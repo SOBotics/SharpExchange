@@ -78,22 +78,12 @@ namespace StackExchange.Chat.Actions
 			GC.SuppressFinalize(this);
 		}
 
-		public object ScheduleAction(ChatAction act)
+		public Task<T> ScheduleActionAsync<T>(ChatAction act)
 		{
-			return ScheduleAction(act, Timeout.InfiniteTimeSpan);
+			return ScheduleActionAsync<T>(act, Timeout.InfiniteTimeSpan);
 		}
 
-		public async Task<object> ScheduleActionAsync(ChatAction act)
-		{
-			return await ScheduleActionAsync(act, Timeout.InfiniteTimeSpan);
-		}
-
-		public object ScheduleAction(ChatAction act, TimeSpan timeout)
-		{
-			return ScheduleActionAsync(act, timeout).Result;
-		}
-
-		public async Task<object> ScheduleActionAsync(ChatAction act, TimeSpan timeout)
+		public async Task<T> ScheduleActionAsync<T>(ChatAction act, TimeSpan timeout)
 		{
 			act.ThrowIfNull(nameof(act));
 
@@ -112,7 +102,7 @@ namespace StackExchange.Chat.Actions
 
 			await Task.Run(() => wait.WaitOne(timeout));
 
-			return data;
+			return (T)data;
 		}
 
 
@@ -154,12 +144,12 @@ namespace StackExchange.Chat.Actions
 				{
 					data = new Dictionary<string, object>
 					{
-						["fkey"] = FKeyAccessor.Get(roomUrl, auth[Host])
+						["fkey"] = FKeyAccessor.GetAsync(roomUrl, auth[Host])
 					};
 				}
 				else
 				{
-					data["fkey"] = FKeyAccessor.Get(roomUrl, auth[Host]);
+					data["fkey"] = FKeyAccessor.GetAsync(roomUrl, auth[Host]);
 				}
 			}
 
@@ -184,7 +174,7 @@ namespace StackExchange.Chat.Actions
 
 			while (!dispose)
 			{
-				response = GetRequest(act).Send();
+				response = GetRequest(act).SendAsync().Result;
 
 				if (response.StatusCode == System.Net.HttpStatusCode.Conflict)
 				{

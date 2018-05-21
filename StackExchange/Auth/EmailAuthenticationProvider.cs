@@ -70,7 +70,7 @@ namespace StackExchange.Auth
 				host = "meta." + host;
 			}
 
-			var fkey = FKeyAccessor.Get();
+			var fkey = FKeyAccessor.GetAsync().Result;
 			var endpoint = $"https://{host}/users/login";
 			var cMan = new CookieManager();
 
@@ -85,7 +85,7 @@ namespace StackExchange.Auth
 					["email"] = email,
 					["password"] = password
 				}
-			}.Send();
+			}.SendAsync().Result;
 
 			var authCookies = cMan.Cookies
 				.Where(x => authCookieNames.Contains(x.Name))

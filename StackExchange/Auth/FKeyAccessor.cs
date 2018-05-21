@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using System.Threading.Tasks;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
 using StackExchange.Net;
@@ -11,17 +12,17 @@ namespace StackExchange.Auth
 		private const string stackExchangeLogin = "http://stackexchange.com/users/login";
 		private static readonly Dictionary<string, string> cache = new Dictionary<string, string>();
 
-		public static string Get() => Get(stackExchangeLogin);
+		public static Task<string> GetAsync() => GetAsync(stackExchangeLogin);
 
-		public static string Get(string url,  CookieManager cMan = null)
+		public static async Task<string> GetAsync(string url, CookieManager cMan = null)
 		{
 			if (cache.ContainsKey(url))
 			{
 				return cache[url];
 			}
 
-			var html = HttpRequest.Get(url, cMan);
-			var dom = new HtmlParser().Parse(html);
+			var html = await HttpRequest.GetAsync(url, cMan);
+			var dom = await new HtmlParser().ParseAsync(html);
 			var fkey = Get(dom);
 
 			cache[url] = fkey;
@@ -29,13 +30,15 @@ namespace StackExchange.Auth
 			return fkey;
 		}
 
-		//TODO: Cache returned value.
 		public static string Get(IHtmlDocument dom)
 		{
 			dom.ThrowIfNull(nameof(dom));
 
-
-			return dom.QuerySelector("input[name=fkey]")?.Attributes["value"]?.Value;
+			return dom.QuerySelector("input[name=fkey]")
+				?.Attributes["value"]
+				?.Value;
 		}
+
+		public static void ClearCache() => cache.Clear();
 	}
 }

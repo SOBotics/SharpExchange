@@ -76,7 +76,7 @@ namespace StackExchange.Chat
 			Text = result.Body;
 
 			var endpoint = $"https://{Host}/messages/{Id}/history";
-			var html = HttpRequest.Get(endpoint, cMan);
+			var html = HttpRequest.GetAsync(endpoint, cMan).Result;
 			var dom = new HtmlParser().Parse(html);
 
 			RoomId = GetRoomId(dom);
@@ -125,21 +125,11 @@ namespace StackExchange.Chat
 
 		public override string ToString() => Text;
 
-		public static bool Exists(string host, int messageId, IAuthenticationProvider auth = null)
-		{
-			return ExistsAsync(host, messageId, auth).Result;
-		}
-
 		public static async Task<bool> ExistsAsync(string host, int messageId, IAuthenticationProvider auth = null)
 		{
 			var result = await GetTextWithStatusAsync(host, messageId, auth);
 
 			return result.Status == HttpStatusCode.OK;
-		}
-
-		public static string GetText(string host, int messageId, IAuthenticationProvider auth = null)
-		{
-			return GetTextAsync(host, messageId, auth).Result;
 		}
 
 		public static async Task<string> GetTextAsync(string host, int messageId, IAuthenticationProvider auth = null)
@@ -151,23 +141,25 @@ namespace StackExchange.Chat
 				: null;
 		}
 
+		public static Task<Message> GetAsync(string host, int messageId, IAuthenticationProvider auth = null)
+		{
+			return Task.Run(() => new Message(host, messageId, auth));
+		}
 
 
-		private static async Task<GetWithStatusResult> GetTextWithStatusAsync(string host, int messageId, IAuthenticationProvider auth = null)
+
+		private static Task<GetWithStatusResult> GetTextWithStatusAsync(string host, int messageId, IAuthenticationProvider auth = null)
 		{
 			var url = string.Format(messageTextUrl, host.GetChatHost(), messageId);
-			GetWithStatusResult result = null;
 
 			if (auth == null)
 			{
-				result = await HttpRequest.GetWithStatusAsync(url);
+				return HttpRequest.GetWithStatusAsync(url);
 			}
 			else
 			{
-				result = await HttpRequest.GetWithStatusAsync(url, auth[host]);
+				return HttpRequest.GetWithStatusAsync(url, auth[host]);
 			}
-
-			return result;
 		}
 
 		private int GetRoomId(IHtmlDocument dom)

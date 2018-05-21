@@ -42,9 +42,11 @@ namespace Demo
 				using (var roomWatcher = new RoomWatcher<DefaultWebSocket>(auth, roomUrl))
 				{
 					// Subscribe to the UserMentioned event.
-					roomWatcher.AddUserMentionedEventHandler(m =>
+					roomWatcher.AddUserMentionedEventHandler(async m =>
 					{
-						actionScheduler.CreateReply("hello!", m);
+						await actionScheduler.CreateReplyAsync("hello!", m);
+
+						/// Do stuff ...
 					});
 
 					// Besides being able to subscribe to the default events,
@@ -61,9 +63,12 @@ namespace Demo
 					roomWatcher.EventRouter.AddProcessor(customEventHanlder);
 
 					// Post a simple message.
-					var messageId = actionScheduler.CreateMessage("Hello world.");
+					var messageId = actionScheduler.CreateMessageAsync("Hello world.").Result;
 
-					Console.Read();
+					while (Console.ReadKey(true).Key != ConsoleKey.Q)
+					{
+
+					}
 				}
 			}
 		}

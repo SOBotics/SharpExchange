@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Linq;
+using System.Threading.Tasks;
 using AngleSharp.Dom;
 using AngleSharp.Dom.Html;
 using AngleSharp.Parser.Html;
@@ -58,11 +59,11 @@ namespace StackExchange.Chat
 
 			if (auth == null)
 			{
-				result = HttpRequest.GetWithStatus(url);
+				result = HttpRequest.GetWithStatusAsync(url).Result;
 			}
 			else
 			{
-				result = HttpRequest.GetWithStatus(url, auth[host]);
+				result = HttpRequest.GetWithStatusAsync(url, auth[host]).Result;
 			}
 
 			if (result.Status != System.Net.HttpStatusCode.OK)
@@ -120,6 +121,11 @@ namespace StackExchange.Chat
 		public override int GetHashCode() => new { Host, Id }.GetHashCode();
 
 		public override string ToString() => Name;
+
+		public static Task<Room> GetAsync(string host, int roomId, IAuthenticationProvider auth = null)
+		{
+			return Task.Run(() => new Room(host, roomId, auth));
+		}
 
 
 
