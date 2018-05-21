@@ -5,6 +5,8 @@ using StackExchange.Chat.Events;
 using StackExchange.Chat.Events.User.Extensions;
 using StackExchange.Net.WebSockets;
 using StackExchange.Chat.Actions;
+using System.Threading.Tasks;
+using StackExchange.Chat;
 
 namespace Demo
 {
@@ -26,7 +28,9 @@ namespace Demo
 		// This stuff should ideally be loaded in from a configuration provider.
 		private const string roomUrl = "https://chat.stackoverflow.com/rooms/167908";
 
-		static void Main(string[] args)
+		private static void Main(string[] args) => Demo().Wait();
+
+		private static async Task Demo()
 		{
 			// Fetch your account's credentials from somewhere.
 			var auth = new EmailAuthenticationProvider("", "");
@@ -44,7 +48,7 @@ namespace Demo
 					// Subscribe to the UserMentioned event.
 					roomWatcher.AddUserMentionedEventHandler(async m =>
 					{
-						await actionScheduler.CreateReplyAsync("hello!", m);
+						await actionScheduler.CreateReplyAsync("hello!", m.MessageId);
 
 						/// Do stuff ...
 					});
@@ -63,7 +67,7 @@ namespace Demo
 					roomWatcher.EventRouter.AddProcessor(customEventHanlder);
 
 					// Post a simple message.
-					var messageId = actionScheduler.CreateMessageAsync("Hello world.").Result;
+					var messageId = await actionScheduler.CreateMessageAsync("Hello world.");
 
 					while (Console.ReadKey(true).Key != ConsoleKey.Q)
 					{

@@ -137,7 +137,7 @@ namespace StackExchange.Chat.Events
 				Data = new Dictionary<string, object>
 				{
 					["roomid"] = RoomId,
-					["fkey"] = FKeyAccessor.GetAsync($"https://{Host}/rooms/{RoomId}", Auth[Host])
+					["fkey"] = FKeyAccessor.GetAsync($"https://{Host}/rooms/{RoomId}", Auth[Host]).Result
 				}
 			}.SendAsync().Result;
 
@@ -146,9 +146,9 @@ namespace StackExchange.Chat.Events
 				throw new Exception("Failed to get base WebSocket URL.");
 			}
 
-			dynamic data = JObject.Parse(response.Content);
+			var data = JObject.Parse(response.Content);
 
-			return data.url;
+			return data.Value<string>("url");
 		}
 
 		private int GetGlobalEventCount()
@@ -162,7 +162,7 @@ namespace StackExchange.Chat.Events
 				{
 					["mode"] = "events",
 					["msgCount"] = 0,
-					["fkey"] = FKeyAccessor.GetAsync($"https://{Host}/rooms/{RoomId}", Auth[Host])
+					["fkey"] = FKeyAccessor.GetAsync($"https://{Host}/rooms/{RoomId}", Auth[Host]).Result
 				}
 			}.SendAsync().Result;
 
@@ -171,9 +171,9 @@ namespace StackExchange.Chat.Events
 				throw new Exception("Failed to get global chat event count.");
 			}
 
-			dynamic data = JObject.Parse(response.Content);
+			var data = JObject.Parse(response.Content);
 
-			return data.time;
+			return data.Value<int>("time");
 		}
 	}
 }

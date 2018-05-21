@@ -144,12 +144,12 @@ namespace StackExchange.Chat.Actions
 				{
 					data = new Dictionary<string, object>
 					{
-						["fkey"] = FKeyAccessor.GetAsync(roomUrl, auth[Host])
+						["fkey"] = FKeyAccessor.GetAsync(roomUrl, auth[Host]).Result
 					};
 				}
 				else
 				{
-					data["fkey"] = FKeyAccessor.GetAsync(roomUrl, auth[Host]);
+					data["fkey"] = FKeyAccessor.GetAsync(roomUrl, auth[Host]).Result;
 				}
 			}
 
