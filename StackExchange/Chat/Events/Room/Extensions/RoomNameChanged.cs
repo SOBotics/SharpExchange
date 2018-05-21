@@ -5,7 +5,10 @@ namespace StackExchange.Chat.Events.Room.Extensions
 {
 	public static partial class Extensions
 	{
-		public static RoomNameChanged AddRoomNameChangedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.Room> callback) where T : IWebSocket
+		public static RoomNameChanged AddRoomNameChangedEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<Chat.Room> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -13,7 +16,7 @@ namespace StackExchange.Chat.Events.Room.Extensions
 
 			eventProcessor.OnEvent += () =>
 			{
-				var room = new Chat.Room(rw.Host, rw.RoomId);
+				var room = new Chat.Room(rw.Host, rw.RoomId,  rw.Auth);
 
 				callback(room);
 			};

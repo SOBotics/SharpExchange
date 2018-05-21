@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events.User.Extensions
 {
 	public static partial class Extensions
 	{
-		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(this RoomWatcher<T> rw, Action<ChangedUserAccessLevel> callback) where T : IWebSocket
+		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<ChangedUserAccessLevel> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -18,7 +22,10 @@ namespace StackExchange.Chat.Events.User.Extensions
 			return eventProcessor;
 		}
 
-		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.User, Chat.User, UserAccessLevel> callback) where T : IWebSocket
+		public static UserAccessLevelChanged AddUserAccessLevelChangedEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<Chat.User, Chat.User, UserAccessLevel> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -26,8 +33,22 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 			eventProcessor.OnEvent += ualc =>
 			{
-				var changedBy = new Chat.User(rw.Host, ualc.ChangedBy);
-				var targetUser = new Chat.User(rw.Host, ualc.TargetUser);
+				Chat.User changedBy = null;
+				Chat.User targetUser = null;
+
+				var tasks = new[]
+				{
+					Task.Run(() =>
+					{
+						changedBy = new Chat.User(rw.Host, ualc.ChangedBy, rw.Auth);
+					}),
+					Task.Run(() =>
+					{
+						targetUser = new Chat.User(rw.Host, ualc.TargetUser, rw.Auth);
+					})
+				};
+
+				Task.WaitAll(tasks);
 
 				callback(changedBy, targetUser, ualc.NewLevel);
 			};

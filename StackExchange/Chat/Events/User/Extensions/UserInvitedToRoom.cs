@@ -1,11 +1,15 @@
 ﻿using System;
+using System.Threading.Tasks;
 using StackExchange.Net.WebSockets;
 
 namespace StackExchange.Chat.Events.User.Extensions
 {
 	public static partial class Extensions
 	{
-		public static UserInvitedToRoom AddUserInvitedToRoomEventHandler<T>(this RoomWatcher<T> rw, Action<RoomInvite> callback) where T : IWebSocket
+		public static UserInvitedToRoom AddUserInvitedToRoomEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<RoomInvite> callback) 
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -18,7 +22,10 @@ namespace StackExchange.Chat.Events.User.Extensions
 			return eventProcessor;
 		}
 
-		public static UserInvitedToRoom AddUserInvitedToRoomEventHandler<T>(this RoomWatcher<T> rw, Action<Chat.User,  Chat.User, Chat.Room> callback) where T : IWebSocket
+		public static UserInvitedToRoom AddUserInvitedToRoomEventHandler<T>(
+			this RoomWatcher<T> rw,
+			Action<Chat.User, Chat.User, Chat.Room> callback)
+			where T : IWebSocket
 		{
 			callback.ThrowIfNull(nameof(callback));
 
@@ -26,9 +33,27 @@ namespace StackExchange.Chat.Events.User.Extensions
 
 			eventProcessor.OnEvent += ri =>
 			{
-				var inviter = new Chat.User(rw.Host, ri.Inviter);
-				var invitee = new Chat.User(rw.Host, ri.Invitee);
-				var room = new Chat.Room(rw.Host, ri.Room);
+				Chat.User inviter = null;
+				Chat.User invitee = null;
+				Chat.Room room = null;
+
+				var tasks = new[]
+				{
+					Task.Run(() =>
+					{
+						inviter = new Chat.User(rw.Host, ri.Inviter, rw.Auth);
+					}),
+					Task.Run(() =>
+					{
+						invitee = new Chat.User(rw.Host, ri.Invitee, rw.Auth);
+					}),
+					Task.Run(() =>
+					{
+						room = new Chat.Room(rw.Host, ri.Room, rw.Auth);
+					})
+				};
+
+				Task.WaitAll(tasks);
 
 				callback(inviter, invitee, room);
 			};
