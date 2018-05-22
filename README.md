@@ -1,6 +1,6 @@
 # SharpExchange
 
-An unoffical library for interacting with Stack Exchange chat, and the API (version 2.2). Targeting .NET Standard 2.0.
+An unofficial library for interacting with Stack Exchange chat, and the API (version 2.2). Targeting .NET Standard 2.0.
  
 ---
 
