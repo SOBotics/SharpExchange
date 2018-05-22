@@ -1,12 +1,12 @@
 ﻿using System;
 using Newtonsoft.Json.Linq;
-using StackExchange.Auth;
-using StackExchange.Chat.Events;
-using StackExchange.Chat.Events.User.Extensions;
-using StackExchange.Net.WebSockets;
-using StackExchange.Chat.Actions;
+using SharpExchange.Auth;
+using SharpExchange.Chat.Events;
+using SharpExchange.Chat.Events.User.Extensions;
+using SharpExchange.Net.WebSockets;
+using SharpExchange.Chat.Actions;
 using System.Threading.Tasks;
-using StackExchange.Chat;
+using SharpExchange.Chat;
 
 namespace Demo
 {
