@@ -9,7 +9,7 @@ namespace SharpExchange.Auth
 	internal static class FKeyAccessor
 	{
 		// All sites appear to use the same fkey value, except for chat.
-		private const string SharpExchangeLogin = "http://SharpExchange.com/users/login";
+		private const string SharpExchangeLogin = "http://stackexchange.com/users/login";
 		private static readonly Dictionary<string, string> cache = new Dictionary<string, string>();
 
 		public static Task<string> GetAsync() => GetAsync(SharpExchangeLogin);

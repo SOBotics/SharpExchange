@@ -65,7 +65,7 @@ namespace SharpExchange.Auth
 		{
 			//TODO: Temporary until SE stop using openid to
 			// authenticate email/pwd logins.
-			if (host == "SharpExchange.com")
+			if (host == "stackexchange.com")
 			{
 				host = "meta." + host;
 			}
