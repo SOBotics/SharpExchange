@@ -63,15 +63,20 @@ namespace SharpExchange.Auth
 
 		private void FetchCookies(string host)
 		{
+			var endpoint = "";
+
 			//TODO: Temporary until SE stop using openid to
 			// authenticate email/pwd logins.
 			if (host == "stackexchange.com")
 			{
-				host = "meta." + host;
+				endpoint = $"https://meta.stackexchange.com/users/login";
+			}
+			else
+			{
+				endpoint = $"https://{host}/users/login";
 			}
 
 			var fkey = FKeyAccessor.GetAsync().Result;
-			var endpoint = $"https://{host}/users/login";
 			var cMan = new CookieManager();
 
 			var response = new HttpRequest
