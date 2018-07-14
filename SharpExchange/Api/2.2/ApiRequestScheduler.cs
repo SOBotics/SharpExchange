@@ -42,15 +42,15 @@ namespace SharpExchange.Api.V22
 				return endpointCleaner.Replace(url, "$1$2$3$4$5$6");
 			}
 
-			var split = url.Split('/');
+			var split = url.Split('/').Skip(2);
 			var id = new StringBuilder();
 
 			foreach (var s in split)
 			{
 				if (string.IsNullOrEmpty(s) || (s.Any(char.IsDigit) && s != "2.2")) continue;
 
-				id.Append('/');
 				id.Append(s);
+				id.Append('/');
 			}
 
 			return id.ToString();
