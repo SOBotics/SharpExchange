@@ -27,8 +27,8 @@ namespace SharpExchange.Api.V22
 				}
 			}
 
-			private const double minBackoff = 0.5;
 			private const string backoffField = "backoff";
+			private readonly TimeSpan minBackoff = TimeSpan.FromSeconds(0.5);
 			private readonly Queue<QueuedRequest> reqs;
 			private bool dispose;
 
@@ -89,30 +89,36 @@ namespace SharpExchange.Api.V22
 			private void QueueProcessorLoop()
 			{
 				var mre = new ManualResetEvent(false);
-				var backoff = minBackoff;
 
 				while (!dispose)
 				{
-					mre.WaitOne(TimeSpan.FromSeconds(backoff));
+					mre.WaitOne(minBackoff);
 
 					if (reqs.Count == 0) continue;
 
 					var req = reqs.Dequeue();
+
 					var json = HttpRequest.GetAsync(req.Url).Result;
-					var responseBackoff = 0.0;
+
+					req.Callback.InvokeAsync(json);
+
+					var backoff = 0;
 
 					try
 					{
-						responseBackoff = JObject.Parse(json).Value<int?>(backoffField) ?? 0;
+						backoff = JObject.Parse(json).Value<int?>(backoffField) ?? 0;
 					}
 					catch
 					{
 						//TODO: Log this somewhere.
 					}
 
-					backoff = Math.Max(minBackoff, responseBackoff);
+					if (backoff != 0)
+					{
+						var wait = (int)((backoff * 1000) - minBackoff.TotalMilliseconds);
 
-					req.Callback.InvokeAsync(json);
+						mre.WaitOne(wait);
+					}
 				}
 			}
 		}
