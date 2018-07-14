@@ -67,7 +67,7 @@ namespace SharpExchange.Api.V22
 
 		/// <summary>
 		/// Allows the caller to specify custom fields that
-		/// are currently not exposed by this type.
+		/// are currently not exposed by this library.
 		/// </summary>
 		public Dictionary<string, string> Custom { get; set; }
 

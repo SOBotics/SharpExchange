@@ -2,14 +2,14 @@
 {
 	public enum SortBy
 	{
-		[ApiQueryValue("activity")]
-		PostAcivity,
-
 		[ApiQueryValue("creation")]
-		PostCreation,
+		Creation,
 
 		[ApiQueryValue("votes")]
-		PostVotes,
+		Votes,
+
+		[ApiQueryValue("activity")]
+		PostAcivity,
 
 		[ApiQueryValue("rank")]
 		BadgeRank,
