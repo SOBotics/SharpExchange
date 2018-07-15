@@ -7,40 +7,40 @@ namespace SharpExchange.Api.V22.Types
 	public class Comment
 	{
 		[JsonProperty("body")]
-		public string Body { get; set; }
+		public string Body { get; internal set; }
 
 		[JsonProperty("body_markdown")]
-		public string Markdown { get; set; }
+		public string Markdown { get; internal set; }
 
 		[JsonProperty("can_flag")]
-		public bool? CanFlag { get; set; }
+		public bool? CanFlag { get; internal set; }
 
 		[JsonProperty("comment_id")]
-		public int? Id { get; set; }
+		public int? Id { get; internal set; }
 
 		[JsonProperty("creation_date")]
 		[JsonConverter(typeof(UnixDateTimeConverter))]
-		public DateTime CreatedOn { get; set; }
+		public DateTime CreatedOn { get; internal set; }
 
 		[JsonProperty("edited")]
-		public bool? Edited { get; set; }
+		public bool? Edited { get; internal set; }
 
 		[JsonProperty("link")]
-		public string Link { get; set; }
+		public string Link { get; internal set; }
 
 		[JsonProperty("owner")]
-		public ShallowUser Owner { get; set; }
+		public ShallowUser Owner { get; internal set; }
 
 		[JsonProperty("post_id")]
-		public int? ParentPostId { get; set; }
+		public int? ParentPostId { get; internal set; }
 
 		[JsonProperty("post_type")]
-		public PostType? ParentPostType { get; set; }
+		public PostType? ParentPostType { get; internal set; }
 
 		[JsonProperty("reply_to_user")]
-		public ShallowUser RepliesTo { get; set; }
+		public ShallowUser RepliesTo { get; internal set; }
 
 		[JsonProperty("score")]
-		public int? Score { get; set; }
+		public int? Score { get; internal set; }
 	}
 }
