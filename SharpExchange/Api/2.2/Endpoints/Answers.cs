@@ -65,7 +65,7 @@ namespace SharpExchange.Api.V22.Endpoints
 		/// <summary>
 		/// Gets the top answers a user has posted on questions with a set of tags.
 		/// </summary>
-		public static Task<Result<Answer[]>> GetTopAnswersByUserByTagsAsync(int userId, IEnumerable<string> tags, QueryOptions options = null)
+		public static Task<Result<Answer[]>> GetTopAnswersByUserIdByTagsAsync(int userId, IEnumerable<string> tags, QueryOptions options = null)
 		{
 			tags.ThrowIfNullOrEmpty(nameof(tags));
 			options = options.GetDefaultIfNull();

@@ -39,7 +39,7 @@ namespace SharpExchange.Api.V22.Types
 		public DateTime? CreatedOn { get; internal set; }
 
 		[JsonProperty("down_vote_count")]
-		public int? Downvotes { get; internal set; }
+		public int? DownvoteCount { get; internal set; }
 
 		[JsonProperty("is_accepted")]
 		public bool? Accepted { get; internal set; }
@@ -81,6 +81,6 @@ namespace SharpExchange.Api.V22.Types
 		public string Title { get; internal set; }
 
 		[JsonProperty("up_vote_count")]
-		public int? Upvotes { get; internal set; }
+		public int? UpvoteCount { get; internal set; }
 	}
 }

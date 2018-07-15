@@ -41,13 +41,13 @@ namespace SharpExchange.Api.V22
 		/// Defines which field Min/Max (and Order) apply to.
 		/// </summary>
 		[ApiQueryValue("sort")]
-		public SortBy? Sort { get; set; }
+		public SortBy? SortBy { get; set; }
 
 		/// <summary>
 		/// How the results should be ordered.
 		/// </summary>
 		[ApiQueryValue("order")]
-		public OrderBy? Order { get; set; }
+		public OrderBy? OrderBy { get; set; }
 
 		/// <summary>
 		/// The inclusive lower bound of a range that
@@ -66,8 +66,8 @@ namespace SharpExchange.Api.V22
 		public int? Max { get; set; }
 
 		/// <summary>
-		/// Allows the caller to specify custom fields that
-		/// are currently not exposed by this library.
+		/// Allows the caller to add custom query values
+		/// that are not exposed by the library.
 		/// </summary>
 		public Dictionary<string, string> Custom { get; set; }
 
