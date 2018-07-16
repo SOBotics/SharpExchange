@@ -205,8 +205,7 @@ namespace SharpExchange.Api.V22.Endpoints
 		}
 
 		/// <summary>
-		/// Get the questions asked by a set of users, which are not
-		/// considered to be adequately answered.
+		/// Gets the top questions a user has posted with a set of tags.
 		/// </summary>
 		public static Task<Result<Question[]>> GetTopQuestionByUserIdByTagsAsync(int userId, IEnumerable<string> tags, QueryOptions options = null)
 		{
