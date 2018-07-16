@@ -11,7 +11,7 @@ namespace SharpExchange.Api.V22
 	internal static partial class ApiRequestScheduler
 	{
 		private const string endpointCleanerPtn = @"(?:(2\.2/users)/\d+(/tags)/\S+?(/top-answers))|(?:(2\.2/tags)/\S+?(/(?:faq|info|related|synonyms|wikis|top-a(?:nswer|sk)ers))(?:/\S+)?)|(?:(2\.2/revisions)(?:/[\d;]+))";
-		private static readonly Dictionary<string, Sheduler> schedulers = new Dictionary<string, Sheduler>();
+		private static readonly Dictionary<string, MethodSheduler> schedulers = new Dictionary<string, MethodSheduler>();
 		private static readonly Regex endpointCleaner = new Regex(endpointCleanerPtn, RegexOptions.Compiled);
 
 		public static TimeSpan Timeout { get; set; } = TimeSpan.FromSeconds(60);
@@ -27,7 +27,7 @@ namespace SharpExchange.Api.V22
 
 			if (!schedulers.ContainsKey(endpointId))
 			{
-				schedulers[endpointId] = new Sheduler();
+				schedulers[endpointId] = new MethodSheduler();
 			}
 
 			return schedulers[endpointId].ScheduleAsync<T>(fullUrl);

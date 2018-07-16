@@ -5,7 +5,6 @@ using System.Threading.Tasks;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Linq;
 using SharpExchange.Api.V22.Types;
-using SharpExchange.Net;
 
 #pragma warning disable CS4014
 
@@ -13,7 +12,7 @@ namespace SharpExchange.Api.V22
 {
 	internal static partial class ApiRequestScheduler
 	{
-		private class Sheduler
+		private class MethodSheduler
 		{
 			private class QueuedRequest
 			{
@@ -28,20 +27,20 @@ namespace SharpExchange.Api.V22
 			}
 
 			private const string backoffField = "backoff";
-			private readonly TimeSpan minBackoff = TimeSpan.FromSeconds(0.5);
+			private static readonly ManualResetEvent queueMre = new ManualResetEvent(false);
 			private readonly Queue<QueuedRequest> reqs;
 			private bool dispose;
 
 
 
-			public Sheduler()
+			public MethodSheduler()
 			{
 				reqs = new Queue<QueuedRequest>();
 
 				Task.Run(() => QueueProcessorLoop());
 			}
 
-			~Sheduler()
+			~MethodSheduler()
 			{
 				Dispose();
 			}
@@ -54,6 +53,8 @@ namespace SharpExchange.Api.V22
 				dispose = true;
 
 				reqs.Clear();
+				queueMre.Set();
+				queueMre.Dispose();
 
 				GC.SuppressFinalize(this);
 			}
@@ -79,6 +80,8 @@ namespace SharpExchange.Api.V22
 
 				reqs.Enqueue(new QueuedRequest(callback, fullUrl));
 
+				queueMre.Set();
+
 				await Task.Run(() => mre.WaitOne(Timeout));
 
 				return result;
@@ -92,13 +95,19 @@ namespace SharpExchange.Api.V22
 
 				while (!dispose)
 				{
-					mre.WaitOne(minBackoff);
+					if (reqs.Count == 0)
+					{
+						queueMre.Reset();
+						queueMre.WaitOne();
 
-					if (reqs.Count == 0) continue;
+						if (dispose)
+						{
+							return;
+						}
+					}
 
 					var req = reqs.Dequeue();
-
-					var json = HttpRequest.GetAsync(req.Url).Result;
+					var json = MasterSheduler.Schedule(req.Url);
 
 					req.Callback.InvokeAsync(json);
 
@@ -115,9 +124,7 @@ namespace SharpExchange.Api.V22
 
 					if (backoff != 0)
 					{
-						var wait = (int)((backoff * 1000) - minBackoff.TotalMilliseconds);
-
-						mre.WaitOne(wait);
+						mre.WaitOne(backoff * 1000);
 					}
 				}
 			}
