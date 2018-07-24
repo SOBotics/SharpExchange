@@ -4,7 +4,7 @@ using System;
 
 namespace SharpExchange.Api.V22.Types
 {
-	public class QuestionTimelineEntry
+	public class QuestionTimeline
 	{
 		[JsonProperty("comment_id")]
 		public int? CommentId { get; internal set; }
