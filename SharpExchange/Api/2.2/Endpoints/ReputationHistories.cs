@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SharpExchange.Api.V22.Endpoints
 {
-	public static class ReputationHistory
+	public static class ReputationHistories
 	{
 		/// <summary>
 		/// Gets a history of a user's reputation, excluding private events.

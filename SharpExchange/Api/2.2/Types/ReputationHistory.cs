@@ -4,7 +4,7 @@ using System;
 
 namespace SharpExchange.Api.V22.Types
 {
-	public class ReputationHistoryEntry
+	public class ReputationHistory
 	{
 		[JsonProperty("creation_date")]
 		[JsonConverter(typeof(UnixDateTimeConverter))]

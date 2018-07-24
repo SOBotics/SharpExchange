@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SharpExchange.Api.V22.Endpoints
 {
-	public static class QuestionTimeline
+	public static class QuestionTimelines
 	{
 		/// <summary>
 		/// Gets the timelines of the questions identified by a set of ids.

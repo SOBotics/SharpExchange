@@ -4,7 +4,7 @@ using System;
 
 namespace SharpExchange.Api.V22.Types
 {
-	public class ReputationChange
+	public class Reputation
 	{
 		[JsonProperty("link")]
 		public string Link { get; internal set; }

@@ -4,7 +4,7 @@ using System.Threading.Tasks;
 
 namespace SharpExchange.Api.V22.Endpoints
 {
-	public static class Reputation
+	public static class Reputations
 	{
 		/// <summary>
 		/// Gets a subset of the reputation changes experienced
