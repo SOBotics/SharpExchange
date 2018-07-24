@@ -10,7 +10,7 @@ namespace SharpExchange.Api.V22.Endpoints
 		/// Gets a subset of the reputation changes experienced
 		/// by the users identified by a set of ids.
 		/// </summary>
-		public static Task<Result<ReputationChange[]>> GetByUserIdsAsync(IEnumerable<int> userIds, QueryOptions options = null)
+		public static Task<Result<Reputation[]>> GetByUserIdsAsync(IEnumerable<int> userIds, QueryOptions options = null)
 		{
 			userIds.ThrowIfNullOrEmpty(nameof(userIds));
 			options = options.GetDefaultIfNull();
@@ -18,7 +18,7 @@ namespace SharpExchange.Api.V22.Endpoints
 			var idsStr = userIds.ToDelimitedList();
 			var endpoint = $"{Constants.BaseApiUrl}/users/{idsStr}/reputation";
 
-			return ApiRequestScheduler.ScheduleRequestAsync<ReputationChange[]>(endpoint, options);
+			return ApiRequestScheduler.ScheduleRequestAsync<Reputation[]>(endpoint, options);
 		}
 	}
 }

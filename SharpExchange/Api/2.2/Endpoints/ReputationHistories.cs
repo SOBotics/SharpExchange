@@ -9,7 +9,7 @@ namespace SharpExchange.Api.V22.Endpoints
 		/// <summary>
 		/// Gets a history of a user's reputation, excluding private events.
 		/// </summary>
-		public static Task<Result<ReputationHistoryEntry[]>> GetByUserIdsAsync(IEnumerable<int> userIds, QueryOptions options = null)
+		public static Task<Result<ReputationHistory[]>> GetByUserIdsAsync(IEnumerable<int> userIds, QueryOptions options = null)
 		{
 			userIds.ThrowIfNullOrEmpty(nameof(userIds));
 			options = options.GetDefaultIfNull();
@@ -17,7 +17,7 @@ namespace SharpExchange.Api.V22.Endpoints
 			var idsStr = userIds.ToDelimitedList();
 			var endpoint = $"{Constants.BaseApiUrl}/users/{idsStr}/reputation-history";
 
-			return ApiRequestScheduler.ScheduleRequestAsync<ReputationHistoryEntry[]>(endpoint, options);
+			return ApiRequestScheduler.ScheduleRequestAsync<ReputationHistory[]>(endpoint, options);
 		}
 	}
 }
