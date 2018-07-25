@@ -46,7 +46,7 @@ namespace SharpExchange.Api.V22.Types
 		public DateTime? OpenBetaStartedOn { get; internal set; }
 
 		[JsonProperty("related_sites")]
-		public RelatedSites[] RelatedSites { get; internal set; }
+		public RelatedSite[] RelatedSites { get; internal set; }
 
 		[JsonProperty("site_state")]
 		public SiteState? State { get; internal set; }
@@ -61,6 +61,6 @@ namespace SharpExchange.Api.V22.Types
 		public Styling Styling { get; internal set; }
 
 		[JsonProperty("twitter_account")]
-		public Styling TwitterHandle { get; internal set; }
+		public string TwitterHandle { get; internal set; }
 	}
 }

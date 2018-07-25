@@ -2,7 +2,7 @@
 
 namespace SharpExchange.Api.V22.Types
 {
-	public class RelatedSites
+	public class RelatedSite
 	{
 		[JsonProperty("api_site_parameter")]
 		public string ApiSiteParameter { get; internal set; }
