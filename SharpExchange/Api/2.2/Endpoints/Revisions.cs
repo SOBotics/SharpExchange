@@ -6,7 +6,7 @@ namespace SharpExchange.Api.V22.Endpoints
 {
 	public static class Revisions
 	{
-		public static Task<Result<Revision[]>> GetByPostIds(IEnumerable<int> postIds, QueryOptions options = null)
+		public static Task<Result<Revision[]>> GetByPostIdsAsync(IEnumerable<int> postIds, QueryOptions options = null)
 		{
 			postIds.ThrowIfNullOrEmpty(nameof(postIds));
 			options = options.GetDefaultIfNull();
@@ -17,7 +17,7 @@ namespace SharpExchange.Api.V22.Endpoints
 			return ApiRequestScheduler.ScheduleRequestAsync<Revision[]>(endpoint, options);
 		}
 
-		public static Task<Result<Revision[]>> GetByRevisionGuids(IEnumerable<string> revGuids, QueryOptions options = null)
+		public static Task<Result<Revision[]>> GetByRevisionGuidsAsync(IEnumerable<string> revGuids, QueryOptions options = null)
 		{
 			revGuids.ThrowIfNullOrEmpty(nameof(revGuids));
 			options = options.GetDefaultIfNull();
