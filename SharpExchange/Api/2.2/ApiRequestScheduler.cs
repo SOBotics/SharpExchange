@@ -22,7 +22,7 @@ namespace SharpExchange.Api.V22
 		{
 			endpoint.ThrowIfNullOrEmpty(nameof(endpoint));
 
-			var fullUrl = $"{endpoint}?{options.Query}";
+			var url = endpoint + (options != null ? "?" + options.Query : "");
 			var endpointId = GetEndpointId(endpoint);
 
 			if (!schedulers.ContainsKey(endpointId))
@@ -30,7 +30,7 @@ namespace SharpExchange.Api.V22
 				schedulers[endpointId] = new MethodSheduler();
 			}
 
-			return schedulers[endpointId].ScheduleAsync<T>(fullUrl);
+			return schedulers[endpointId].ScheduleAsync<T>(url);
 		}
 
 
