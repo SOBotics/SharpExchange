@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using SharpExchange.Api.V22;
@@ -187,6 +188,17 @@ namespace SharpExchange
 			return ids
 				.Select(x => x.ToString())
 				.Aggregate((a, b) => $"{a}{delmiter}{b}");
+		}
+
+		public static string GetApiQueryValueAttributeValue(this object o)
+		{
+			var enumVal = o.ToString();
+
+			return o
+				.GetType()
+				.GetMember(enumVal)[0]
+				.GetCustomAttribute<ApiQueryValueAttribute>()
+				.Value;
 		}
 	}
 }

@@ -94,12 +94,7 @@ namespace SharpExchange.Api.V22
 
 					if (enumTypes.Contains(vType))
 					{
-						var enumVal = val.ToString();
-
-						opts[name] = vType
-							.GetMember(enumVal)[0]
-							.GetCustomAttribute<ApiQueryValueAttribute>()
-							.Value;
+						opts[name] = val.GetApiQueryValueAttributeValue();
 					}
 					else if (vType == typeof(DateTime))
 					{
