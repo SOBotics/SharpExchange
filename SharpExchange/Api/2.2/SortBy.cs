@@ -2,13 +2,13 @@
 {
 	public enum SortBy
 	{
-		[ApiQueryValue("creation")]
-		Creation,
+		[ApiQueryValue("creation_date")]
+		CreationDate,
 
 		[ApiQueryValue("votes")]
 		Votes,
 
-		[ApiQueryValue("activity")]
+		[ApiQueryValue("last_activity_date")]
 		PostAcivity,
 
 		[ApiQueryValue("rank")]
@@ -18,6 +18,12 @@
 		BadgeName,
 
 		[ApiQueryValue("type")]
-		BadgeType
+		BadgeType,
+
+		[ApiQueryValue("approval_date")]
+		EditApprovalDate,
+
+		[ApiQueryValue("rejection_date")]
+		EditRejectionDate
 	}
 }
