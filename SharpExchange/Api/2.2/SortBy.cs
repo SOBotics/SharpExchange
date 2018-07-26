@@ -24,6 +24,12 @@
 		EditApprovalDate,
 
 		[ApiQueryValue("rejection_date")]
-		EditRejectionDate
+		EditRejectionDate,
+
+		[ApiQueryValue("count")]
+		TagPopularity,
+
+		[ApiQueryValue("name")]
+		TagName,
 	}
 }
