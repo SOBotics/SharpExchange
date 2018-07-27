@@ -2,7 +2,7 @@
 
 namespace SharpExchange.Api.V22.Types
 {
-	public enum TimelineType
+	public enum QuestionTimelineType
 	{
 		[EnumMember(Value = "question")]
 		Question,

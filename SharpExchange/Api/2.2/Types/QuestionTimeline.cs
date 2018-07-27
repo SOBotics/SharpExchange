@@ -29,7 +29,7 @@ namespace SharpExchange.Api.V22.Types
 		public string RevisionGuid { get; internal set; }
 
 		[JsonProperty("timeline_type")]
-		public TimelineType? EntryType { get; internal set; }
+		public QuestionTimelineType? TimelineType { get; internal set; }
 
 		[JsonProperty("up_vote_count")]
 		public int? UpVoteCount { get; internal set; }
