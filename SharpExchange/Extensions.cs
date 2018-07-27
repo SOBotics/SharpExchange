@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net;
 using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
@@ -124,9 +125,11 @@ namespace SharpExchange
 
 			foreach (var kv in d)
 			{
+				var encoded = WebUtility.UrlEncode(kv.Value);
+
 				builder.Append(kv.Key);
 				builder.Append('=');
-				builder.Append(kv.Value);
+				builder.Append(encoded);
 				builder.Append('&');
 			}
 

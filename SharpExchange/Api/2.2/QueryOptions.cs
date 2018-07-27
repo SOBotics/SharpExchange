@@ -69,7 +69,7 @@ namespace SharpExchange.Api.V22
 		/// Allows the caller to add custom query values
 		/// that are not exposed by the library.
 		/// </summary>
-		public Dictionary<string, string> Custom { get; set; }
+		public Dictionary<string, string> Custom { get; set; } = new Dictionary<string, string>();
 
 		public string Query => Custom.MergeInto(Options)?.ToQueryString();
 
