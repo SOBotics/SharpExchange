@@ -2,41 +2,61 @@
 {
 	public enum SortBy
 	{
-		//TODO: We done fucked up.
-		//[ApiQueryValue("creation")]
-		//CreationDate,
+		[ApiQueryValue("creation")]
+		CreationDate,
 
-		//[ApiQueryValue("votes")]
-		//Votes,
+		[ApiQueryValue("votes")]
+		Votes,
 
-		//[ApiQueryValue("last_activity_date")]
-		//PostAcivity,
+		[ApiQueryValue("activity")]
+		PostActivity,
 
-		//[ApiQueryValue("rank")]
-		//BadgeRank,
+		[ApiQueryValue("name")]
+		BadgeName,
 
-		//[ApiQueryValue("name")]
-		//BadgeName,
+		[ApiQueryValue("rank")]
+		BadgeRank,
 
-		//[ApiQueryValue("type")]
-		//BadgeType,
+		[ApiQueryValue("type")]
+		BadgeType,
 
-		//[ApiQueryValue("approval_date")]
-		//EditApprovalDate,
+		[ApiQueryValue("hot")]
+		QuestionHot,
 
-		//[ApiQueryValue("rejection_date")]
-		//EditRejectionDate,
+		[ApiQueryValue("week")]
+		QuestionWeek,
 
-		//[ApiQueryValue("count")]
-		//TagPopularity,
+		[ApiQueryValue("month")]
+		QuestionMonth,
 
-		//[ApiQueryValue("name")]
-		//TagName,
+		[ApiQueryValue("approval")]
+		SuggestedEditApprovalDate,
 
-		//[ApiQueryValue("applied_count")]
-		//TagSynonymAppliedCount,
+		[ApiQueryValue("rejection")]
+		SuggestedEditRejectionDate,
 
-		//[ApiQueryValue("last_applied_date")]
-		//TagSynonymActivity,
+		[ApiQueryValue("count")]
+		TagPopularity,
+
+		[ApiQueryValue("activity")]
+		TagActivity,
+
+		[ApiQueryValue("name")]
+		TagName,
+
+		[ApiQueryValue("applied")]
+		TagSynonymAppliedCount,
+
+		[ApiQueryValue("activity")]
+		TagSynonymActivity,
+
+		[ApiQueryValue("reputation")]
+		UserReputation,
+
+		[ApiQueryValue("name")]
+		UserName,
+
+		[ApiQueryValue("modified")]
+		UserLastModifiedDate,
 	}
 }
