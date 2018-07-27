@@ -1,6 +1,4 @@
 ﻿using SharpExchange.Api.V22.Types;
-using System.Collections.Generic;
-using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
 

@@ -1,11 +1,4 @@
-﻿using System;
-using Newtonsoft.Json.Linq;
-using SharpExchange.Auth;
-using SharpExchange.Chat.Events;
-using SharpExchange.Chat.Events.User.Extensions;
-using SharpExchange.Net.WebSockets;
-using SharpExchange.Chat.Actions;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using SharpExchange.Api.V22.Endpoints;
 using SharpExchange.Api.V22;
 using System.Collections.Generic;

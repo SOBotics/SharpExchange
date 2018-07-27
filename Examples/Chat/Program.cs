@@ -6,8 +6,6 @@ using SharpExchange.Chat.Events.User.Extensions;
 using SharpExchange.Net.WebSockets;
 using SharpExchange.Chat.Actions;
 using System.Threading.Tasks;
-using SharpExchange.Api.V22.Endpoints;
-using SharpExchange.Api.V22;
 
 public class AllData : ChatEventDataProcessor, IChatEventHandler<string>
 {

@@ -1,7 +1,4 @@
 ﻿using SharpExchange.Api.V22.Types;
-using System;
-using System.Collections.Generic;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace SharpExchange.Api.V22.Endpoints
