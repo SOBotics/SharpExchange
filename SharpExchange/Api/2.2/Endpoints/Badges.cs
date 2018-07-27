@@ -107,10 +107,6 @@ namespace SharpExchange.Api.V22.Endpoints
 		/// Returns recently awarded badges in the system. As these
 		/// badges have been awarded, they will have the
 		/// <see cref="Badge.User"/> property set.
-		/// 
-		/// Does not support the following <see cref="QueryOptions"/> properties:
-		/// <see cref="QueryOptions.Sort"/>, <see cref="QueryOptions.Order"/>,
-		/// <see cref="QueryOptions.Max"/>, <see cref="QueryOptions.Min"/>.
 		/// </summary>
 		public static Task<Result<Badge[]>> GetRecentAsync(QueryOptions options = null)
 		{
