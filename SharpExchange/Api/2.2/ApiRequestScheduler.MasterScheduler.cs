@@ -24,7 +24,7 @@ namespace SharpExchange.Api.V22
 				}
 			}
 
-			private static readonly TimeSpan waitTime = TimeSpan.FromSeconds(0.5);
+			private static readonly TimeSpan waitTime = TimeSpan.FromSeconds(1.0 / 30);
 			private static readonly ManualResetEvent queueMre = new ManualResetEvent(false);
 			private static readonly Queue<QueuedRequest> reqs;
 			private static bool dispose;
