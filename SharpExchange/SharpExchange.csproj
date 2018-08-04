@@ -2,6 +2,25 @@
 
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
+    <Authors>ArcticEcho</Authors>
+    <Company>SOBotics</Company>
+    <Description>An unofficial library for interacting with Stack Exchange chat, and the API</Description>
+    <PackageLicenseUrl>https://github.com/SOBotics/SharpExchange/blob/master/LICENSE</PackageLicenseUrl>
+    <PackageProjectUrl>https://github.com/SOBotics/SharpExchange</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/SOBotics/SharpExchange</RepositoryUrl>
+    <PackageTags>api chat stackexchange websocket</PackageTags>
+    <AssemblyVersion>1.0.1.0</AssemblyVersion>
+    <FileVersion>1.0.0.0</FileVersion>
+    <Version>1.0.1</Version>
+    <PackageReleaseNotes>Fix maximum API request rate.</PackageReleaseNotes>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
+    <DocumentationFile>bin\Debug\netstandard2.0\SharpExchange.xml</DocumentationFile>
+  </PropertyGroup>
+
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
+    <DocumentationFile>bin\Release\netstandard2.0\SharpExchange.xml</DocumentationFile>
   </PropertyGroup>
 
   <ItemGroup>
