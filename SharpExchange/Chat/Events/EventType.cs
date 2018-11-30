@@ -115,7 +115,7 @@
 		TimeBreak = 21,
 
 		/// <summary>
-		/// No idea.
+		/// New item in the feeds received.
 		/// </summary>
 		FeedTicker = 22,
 
