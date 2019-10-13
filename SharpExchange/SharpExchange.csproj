@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
-    <TargetFramework>netstandard2.0</TargetFramework>
+    <TargetFramework>netstandard2.1</TargetFramework>
     <Authors>ArcticEcho</Authors>
     <Company>SOBotics</Company>
     <Description>An unofficial library for interacting with Stack Exchange chat, and the API</Description>
