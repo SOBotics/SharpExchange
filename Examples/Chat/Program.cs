@@ -35,42 +35,33 @@ public class Program
 		// Create an instance of the ActionScheduler. This will
 		// allow us to execute chat actions like: posting messages,
 		// kicking users, moving messages, etc.
-		using (var actionScheduler = new ActionScheduler(auth, roomUrl))
+		using var actionScheduler = new ActionScheduler(auth, roomUrl);
+		// Create an instance of the RoomWatcher class. Here we
+		// specify (via the type parameter) what WebSocket implementation
+		// we'd like to use. This class allows you to subscribe to chat events.
+		using var roomWatcher = new RoomWatcher<DefaultWebSocket>(auth, roomUrl);
+		// Subscribe to the UserMentioned event.
+		_ = roomWatcher.AddUserMentionedEventHandler(async m => await actionScheduler.CreateReplyAsync("hello!", m.MessageId));
+
+		// Besides being able to subscribe to the default events,
+		// you can also create (and listen to) your own. Your class must
+		// implement the ChatEventDataProcessor class, you can also
+		// optionally implement IChatEventHandler or IChatEventHandler<T>.
+		var customEventHanlder = new AllData();
+
+		// Add a very basic handler.
+		customEventHanlder.OnEvent += data => Console.WriteLine(data);
+
+		// Add our custom event handler so we can
+		// begin processing the incoming event data.
+		roomWatcher.EventRouter.AddProcessor(customEventHanlder);
+
+		// Post a simple message.
+		var messageId = await actionScheduler.CreateMessageAsync("Hello world.");
+
+		while (Console.ReadKey(true).Key != ConsoleKey.Q)
 		{
-			// Create an instance of the RoomWatcher class. Here we
-			// specify (via the type parameter) what WebSocket implementation
-			// we'd like to use. This class allows you to subscribe to chat events.
-			using (var roomWatcher = new RoomWatcher<DefaultWebSocket>(auth, roomUrl))
-			{
-				// Subscribe to the UserMentioned event.
-				roomWatcher.AddUserMentionedEventHandler(async m =>
-				{
-					await actionScheduler.CreateReplyAsync("hello!", m.MessageId);
 
-					/// Do stuff ...
-				});
-
-				// Besides being able to subscribe to the default events,
-				// you can also create (and listen to) your own. Your class must
-				// implement the ChatEventDataProcessor class, you can also
-				// optionally implement IChatEventHandler or IChatEventHandler<T>.
-				var customEventHanlder = new AllData();
-
-				// Add a very basic handler.
-				customEventHanlder.OnEvent += data => Console.WriteLine(data);
-
-				// Add our custom event handler so we can
-				// begin processing the incoming event data.
-				roomWatcher.EventRouter.AddProcessor(customEventHanlder);
-
-				// Post a simple message.
-				var messageId = await actionScheduler.CreateMessageAsync("Hello world.");
-
-				while (Console.ReadKey(true).Key != ConsoleKey.Q)
-				{
-
-				}
-			}
 		}
 	}
 }

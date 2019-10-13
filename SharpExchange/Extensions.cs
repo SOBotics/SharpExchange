@@ -127,13 +127,13 @@ namespace SharpExchange
 			{
 				var encoded = WebUtility.UrlEncode(kv.Value);
 
-				builder.Append(kv.Key);
-				builder.Append('=');
-				builder.Append(encoded);
-				builder.Append('&');
+				_ = builder.Append(kv.Key);
+				_ = builder.Append('=');
+				_ = builder.Append(encoded);
+				_ = builder.Append('&');
 			}
 
-			builder.Remove(builder.Length - 1, 1);
+			_ = builder.Remove(builder.Length - 1, 1);
 
 			return builder.ToString();
 		}

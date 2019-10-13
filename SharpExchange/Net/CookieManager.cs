@@ -6,7 +6,7 @@ namespace SharpExchange.Net
 {
 	public class CookieManager
 	{
-		private Dictionary<string, Cookie> cookies;
+		private readonly Dictionary<string, Cookie> cookies;
 
 		public Cookie this[string name] => cookies[name];
 
@@ -59,7 +59,7 @@ namespace SharpExchange.Net
 			{
 				if (cookie.Expired)
 				{
-					cookies.Remove(cookie.Name);
+					_ = cookies.Remove(cookie.Name);
 				}
 				else
 				{

@@ -49,8 +49,8 @@ namespace SharpExchange.Api.V22
 			{
 				if (string.IsNullOrEmpty(s) || (s.Any(char.IsDigit) && s != "2.2")) continue;
 
-				id.Append(s);
-				id.Append('/');
+				_ = id.Append(s);
+				_ = id.Append('/');
 			}
 
 			return id.ToString();

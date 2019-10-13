@@ -295,7 +295,7 @@ namespace SharpExchange.Chat
 					?.Value
 					.Split()[0];
 
-				int.TryParse(msgCountStr ?? "0", out var msgCount);
+				_ = int.TryParse(msgCountStr ?? "0", out var msgCount);
 
 				users[i] = new User
 				{

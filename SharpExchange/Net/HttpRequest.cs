@@ -98,7 +98,7 @@ namespace SharpExchange.Net
 
 				foreach (var c in valIdCookies)
 				{
-					request.AddCookie(c.Name, c.Value);
+					_ = request.AddCookie(c.Name, c.Value);
 				}
 			}
 
@@ -106,7 +106,7 @@ namespace SharpExchange.Net
 			{
 				foreach (var k in Data.Keys)
 				{
-					request.AddParameter(k, Data[k]);
+					_ = request.AddParameter(k, Data[k]);
 				}
 			}
 

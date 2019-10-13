@@ -236,7 +236,7 @@ namespace SharpExchange.Chat
 
 			for (var i = 0; i < childCount; i++)
 			{
-				content.RemoveChild(content.Children[0]);
+				_ = content.RemoveChild(content.Children[0]);
 			}
 
 			var isPuregd = content.TextContent.Trim() == "(older data no longer available)";

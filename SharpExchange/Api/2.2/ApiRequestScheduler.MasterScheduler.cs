@@ -36,7 +36,7 @@ namespace SharpExchange.Api.V22
 			{
 				reqs = new Queue<QueuedRequest>();
 
-				Task.Run(() => QueueProcessorLoop());
+				_ = Task.Run(() => QueueProcessorLoop());
 			}
 
 
@@ -47,7 +47,7 @@ namespace SharpExchange.Api.V22
 				dispose = true;
 
 				reqs.Clear();
-				queueMre.Set();
+				_ = queueMre.Set();
 				queueMre.Dispose();
 			}
 
@@ -60,14 +60,14 @@ namespace SharpExchange.Api.V22
 				{
 					result = x;
 
-					mre.Set();
+					_ = mre.Set();
 				});
 
 				reqs.Enqueue(new QueuedRequest(callback, endpoint));
 
-				queueMre.Set();
+				_ = queueMre.Set();
 
-				mre.WaitOne(Timeout);
+				_ = mre.WaitOne(Timeout);
 
 				return result;
 			}
@@ -82,8 +82,8 @@ namespace SharpExchange.Api.V22
 				{
 					if (reqs.Count == 0)
 					{
-						queueMre.Reset();
-						queueMre.WaitOne();
+						_ = queueMre.Reset();
+						_ = queueMre.WaitOne();
 
 						if (dispose)
 						{
@@ -94,8 +94,8 @@ namespace SharpExchange.Api.V22
 					var req = reqs.Dequeue();
 					var json = HttpRequest.GetAsync(req.Url).Result;
 
-					req.Callback.InvokeAsync(json);
-					mre.WaitOne(waitTime);
+					_ = req.Callback.InvokeAsync(json);
+					_ = mre.WaitOne(waitTime);
 				}
 			}
 		}
