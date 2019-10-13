@@ -1,7 +1,7 @@
 ﻿using System.Collections.Generic;
 using System.Threading.Tasks;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using SharpExchange.Net;
 
 namespace SharpExchange.Auth
@@ -22,7 +22,7 @@ namespace SharpExchange.Auth
 			}
 
 			var html = await HttpRequest.GetAsync(url, cMan);
-			var dom = await new HtmlParser().ParseAsync(html);
+			var dom = await new HtmlParser().ParseDocumentAsync(html);
 			var fkey = Get(dom);
 
 			cache[url] = fkey;

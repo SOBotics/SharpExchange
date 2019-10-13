@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using SharpExchange.Net;
 
 namespace SharpExchange.Chat
@@ -77,7 +77,7 @@ namespace SharpExchange.Chat
 
 			var endpoint = $"https://{Host}/messages/{Id}/history";
 			var html = HttpRequest.GetAsync(endpoint, cMan).Result;
-			var dom = new HtmlParser().Parse(html);
+			var dom = new HtmlParser().ParseDocument(html);
 
 			RoomId = GetRoomId(dom);
 			Stars = GetStars(dom);

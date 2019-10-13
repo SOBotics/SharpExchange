@@ -2,8 +2,8 @@
 using System.Linq;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using SharpExchange.Net;
 
 namespace SharpExchange.Chat
@@ -71,7 +71,7 @@ namespace SharpExchange.Chat
 				throw new Exception($"Unable to find room {roomId} on {host}.");
 			}
 
-			var dom = new HtmlParser().Parse(result.Body);
+			var dom = new HtmlParser().ParseDocument(result.Body);
 
 			Host = host;
 			Id = roomId;
