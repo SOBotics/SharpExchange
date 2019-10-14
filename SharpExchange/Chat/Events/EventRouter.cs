@@ -9,7 +9,7 @@ namespace SharpExchange.Chat.Events
 {
 	public sealed class EventRouter : IDisposable
 	{
-		private List<ChatEventDataProcessor> processors;
+		private readonly List<ChatEventDataProcessor> processors;
 		private bool dispose;
 
 		public int RoomId { get; private set; }
@@ -99,7 +99,7 @@ namespace SharpExchange.Chat.Events
 						continue;
 					}
 
-					Task.Run(() => processor.ProcessEventData(ev));
+					_ = Task.Run(() => processor.ProcessEventData(ev));
 				}
 			}
 		}

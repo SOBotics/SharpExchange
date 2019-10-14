@@ -14,7 +14,7 @@ namespace SharpExchange.Net.WebSockets
 	{
 		private const int bufferSize = 4 * 1024;
 		private ClientWebSocket socket;
-		private CancellationTokenSource socketTokenSource;
+		private readonly CancellationTokenSource socketTokenSource;
 		private bool dispose;
 
 		public event Action OnOpen;
@@ -83,8 +83,8 @@ namespace SharpExchange.Net.WebSockets
 
 			await socket.ConnectAsync(Endpoint, socketTokenSource.Token);
 
-			Task.Run(() => Listen());
-			OnOpen.InvokeAsync();
+			_ = Task.Run(() => Listen());
+			_ = OnOpen.InvokeAsync();
 		}
 
 		public async Task SendAsync(string message)
@@ -147,7 +147,7 @@ namespace SharpExchange.Net.WebSockets
 				catch (AggregateException ex)
 				when (ex.InnerException?.GetType() == typeof(TaskCanceledException))
 				{
-					OnClose.InvokeAsync();
+					_ = OnClose.InvokeAsync();
 
 					return;
 				}
@@ -159,15 +159,15 @@ namespace SharpExchange.Net.WebSockets
 
 					try
 					{
-						socketTokenSource.Token.WaitHandle.WaitOne(1000);
+						_ = socketTokenSource.Token.WaitHandle.WaitOne(1000);
 
 						ConnectAsync().Wait();
 					}
 					catch (Exception e2)
 					{
-						OnReconnectFailed.InvokeAsync();
-						OnError.InvokeAsync(e2);
-						OnClose.InvokeAsync();
+						_ = OnReconnectFailed.InvokeAsync();
+						_ = OnError.InvokeAsync(e2);
+						_ = OnClose.InvokeAsync();
 					}
 
 					return;
@@ -180,10 +180,10 @@ namespace SharpExchange.Net.WebSockets
 					buffer.AddRange(b);
 				}
 
-				Task.Run(() => HandleNewMessage(msgInfo, buffer.ToArray()));
+				_ = Task.Run(() => HandleNewMessage(msgInfo, buffer.ToArray()));
 			}
 
-			OnClose.InvokeAsync();
+			_ = OnClose.InvokeAsync();
 		}
 
 		private void HandleNewMessage(WebSocketReceiveResult msgInfo, byte[] buffer)

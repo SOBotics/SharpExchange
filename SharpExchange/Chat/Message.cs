@@ -4,8 +4,8 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.Net;
 using System.Threading.Tasks;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using SharpExchange.Net;
 
 namespace SharpExchange.Chat
@@ -77,7 +77,7 @@ namespace SharpExchange.Chat
 
 			var endpoint = $"https://{Host}/messages/{Id}/history";
 			var html = HttpRequest.GetAsync(endpoint, cMan).Result;
-			var dom = new HtmlParser().Parse(html);
+			var dom = new HtmlParser().ParseDocument(html);
 
 			RoomId = GetRoomId(dom);
 			Stars = GetStars(dom);
@@ -236,7 +236,7 @@ namespace SharpExchange.Chat
 
 			for (var i = 0; i < childCount; i++)
 			{
-				content.RemoveChild(content.Children[0]);
+				_ = content.RemoveChild(content.Children[0]);
 			}
 
 			var isPuregd = content.TextContent.Trim() == "(older data no longer available)";

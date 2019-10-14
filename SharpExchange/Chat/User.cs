@@ -1,8 +1,8 @@
 ﻿using System;
 using System.Threading.Tasks;
 using AngleSharp.Dom;
-using AngleSharp.Dom.Html;
-using AngleSharp.Parser.Html;
+using AngleSharp.Html.Dom;
+using AngleSharp.Html.Parser;
 using SharpExchange.Net;
 
 namespace SharpExchange.Chat
@@ -74,7 +74,7 @@ namespace SharpExchange.Chat
 				throw new Exception($"Unable to find user {userId} on {host}.");
 			}
 
-			var dom = new HtmlParser().Parse(result.Body);
+			var dom = new HtmlParser().ParseDocument(result.Body);
 
 			Host = host;
 			Id = userId;
@@ -136,7 +136,7 @@ namespace SharpExchange.Chat
 
 			var url = $"https://{host}/faq";
 			var html = await HttpRequest.GetAsync(url, auth[host]);
-			var dom = await new HtmlParser().ParseAsync(html);
+			var dom = await new HtmlParser().ParseDocumentAsync(html);
 			var idStr = dom
 				.QuerySelector(".topbar-menu-links a")
 				?.Attributes["href"]
@@ -319,7 +319,7 @@ namespace SharpExchange.Chat
 					?.Value
 					.Split()[0];
 
-				int.TryParse(msgCountStr ?? "0", out var msgCount);
+				_ = int.TryParse(msgCountStr ?? "0", out var msgCount);
 
 				rooms[i] = new Room
 				{

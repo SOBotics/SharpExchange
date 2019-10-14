@@ -37,7 +37,7 @@ namespace SharpExchange.Api.V22
 			{
 				reqs = new Queue<QueuedRequest>();
 
-				Task.Run(() => QueueProcessorLoop());
+				_ = Task.Run(() => QueueProcessorLoop());
 			}
 
 			~MethodSheduler()
@@ -53,7 +53,7 @@ namespace SharpExchange.Api.V22
 				dispose = true;
 
 				reqs.Clear();
-				queueMre.Set();
+				_ = queueMre.Set();
 				queueMre.Dispose();
 
 				GC.SuppressFinalize(this);
@@ -75,14 +75,14 @@ namespace SharpExchange.Api.V22
 						//TODO: Log this somewhere.
 					}
 
-					mre.Set();
+					_ = mre.Set();
 				});
 
 				reqs.Enqueue(new QueuedRequest(callback, fullUrl));
 
-				queueMre.Set();
+				_ = queueMre.Set();
 
-				await Task.Run(() => mre.WaitOne(Timeout));
+				_ = await Task.Run(() => mre.WaitOne(Timeout));
 
 				return result;
 			}
@@ -97,8 +97,8 @@ namespace SharpExchange.Api.V22
 				{
 					if (reqs.Count == 0)
 					{
-						queueMre.Reset();
-						queueMre.WaitOne();
+						_ = queueMre.Reset();
+						_ = queueMre.WaitOne();
 
 						if (dispose)
 						{
@@ -109,7 +109,7 @@ namespace SharpExchange.Api.V22
 					var req = reqs.Dequeue();
 					var json = MasterSheduler.Schedule(req.Url);
 
-					req.Callback.InvokeAsync(json);
+					_ = req.Callback.InvokeAsync(json);
 
 					var backoff = 0;
 
@@ -124,7 +124,7 @@ namespace SharpExchange.Api.V22
 
 					if (backoff != 0)
 					{
-						mre.WaitOne(backoff * 1000);
+						_ = mre.WaitOne(backoff * 1000);
 					}
 				}
 			}

@@ -11,7 +11,7 @@ namespace SharpExchange.Chat.Actions
 {
 	public class ActionScheduler : IDisposable
 	{
-		private IAuthenticationProvider auth;
+		private readonly IAuthenticationProvider auth;
 		private readonly ManualResetEvent queueMre;
 		private readonly Queue<ChatAction> actionQueue;
 		private bool dispose;
@@ -36,7 +36,7 @@ namespace SharpExchange.Chat.Actions
 			Host = host.GetChatHost();
 			RoomId = id;
 
-			Task.Run(new Action(ProcessQueue));
+			_ = Task.Run(new Action(ProcessQueue));
 		}
 
 		public ActionScheduler(IAuthenticationProvider authProvider, string host, int roomId)
@@ -56,7 +56,7 @@ namespace SharpExchange.Chat.Actions
 			Host = host.GetChatHost();
 			RoomId = roomId;
 
-			Task.Run(new Action(ProcessQueue));
+			_ = Task.Run(new Action(ProcessQueue));
 		}
 
 		~ActionScheduler()
@@ -71,7 +71,7 @@ namespace SharpExchange.Chat.Actions
 			if (dispose) return;
 			dispose = true;
 
-			queueMre.Set();
+			_ = queueMre.Set();
 			queueMre.Dispose();
 			actionQueue.Clear();
 
@@ -93,14 +93,14 @@ namespace SharpExchange.Chat.Actions
 			act.CallBack = new Action<object>(x =>
 			{
 				data = x;
-				wait.Set();
+				_ = wait.Set();
 			});
 
 			actionQueue.Enqueue(act);
 
-			queueMre.Set();
+			_ = queueMre.Set();
 
-			await Task.Run(() => wait.WaitOne(timeout));
+			_ = await Task.Run(() => wait.WaitOne(timeout));
 
 			return (T)data;
 		}
@@ -113,7 +113,7 @@ namespace SharpExchange.Chat.Actions
 			{
 				if (actionQueue.Count == 0)
 				{
-					queueMre.Reset();
+					_ = queueMre.Reset();
 				}
 
 				if (queueMre.WaitOne() && dispose)
