@@ -61,8 +61,8 @@ namespace SharpExchange.Chat.Events
 			if (dispose) return;
 			dispose = true;
 
-			EventRouter.Dispose();
-			WebSocket.Dispose();
+			EventRouter?.Dispose();
+			WebSocket?.Dispose();
 
 			GC.SuppressFinalize(this);
 		}
