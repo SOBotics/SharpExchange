@@ -59,6 +59,7 @@ namespace SharpExchange.Auth
 		/// Forces the authentication provider to login to a given community.
 		/// Automatically called when cookies are requested that aren't in the cache yet.
 		/// </summary>
+		/// <param name="host">Community to log in to, e.g. "stackexchange.com".</param>
 		/// <returns>Whether or not the login was successful.</returns>
 		public bool Login(string host)
 		{
