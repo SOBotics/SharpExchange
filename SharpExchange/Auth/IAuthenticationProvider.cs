@@ -10,9 +10,9 @@ namespace SharpExchange
 		void InvalidateAllCache();
 
 		/// <summary>
-		/// Log in to the given room.
+		/// Log in to the given community.
 		/// </summary>
 		/// <returns>Whether or not the login was successful.</returns>
-		bool Login(string url);
+		bool Login(string host);
 	}
 }
