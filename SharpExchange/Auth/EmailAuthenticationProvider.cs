@@ -55,6 +55,25 @@ namespace SharpExchange.Auth
 
 
 
+		/// <summary>
+		/// Forces the authentication provider to login to a given community.
+		/// Automatically called when cookies are requested that aren't in the cache yet.
+		/// </summary>
+		/// <returns>Whether or not the login was successful.</returns>
+		public bool Login(string host)
+		{
+			try
+			{
+				FetchCookies(host);
+				return true;
+			}
+
+			catch (InvalidCredentialsException)
+			{
+				return false;
+			}
+		}
+
 		public void InvalidateHostCache(string host) => cache.Remove(host);
 
 		public void InvalidateAllCache() => cache.Clear();
@@ -102,25 +121,6 @@ namespace SharpExchange.Auth
 			}
 
 			cache[host] = authCookies;
-		}
-
-		/// <summary>
-		/// Log in to the given room. 
-		/// Automatically called when cookies are requested that aren't in the cache yet.
-		/// </summary>
-		/// <returns>Whether or not the login was successful.</returns>
-		public bool Login(string url)
-		{
-			try
-			{
-				this.FetchCookies(url);
-				return true;
-			}
-
-			catch (InvalidCredentialsException)
-			{
-				return false;
-			}
 		}
 	}
 }
