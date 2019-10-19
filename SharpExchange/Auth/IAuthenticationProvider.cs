@@ -8,5 +8,11 @@ namespace SharpExchange
 
 		void InvalidateHostCache(string host);
 		void InvalidateAllCache();
+
+		/// <summary>
+		/// Log in to the given room.
+		/// </summary>
+		/// <returns>Whether or not the login was successful.</returns>
+		bool Login(string url);
 	}
 }

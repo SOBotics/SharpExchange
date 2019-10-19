@@ -32,6 +32,9 @@ public class Program
 		// Fetch your account's credentials from somewhere.
 		var auth = new EmailAuthenticationProvider("", "");
 
+		// Log in to your favourite chat room.
+		_ = auth.Login(roomUrl);
+
 		// Create an instance of the ActionScheduler. This will
 		// allow us to execute chat actions like: posting messages,
 		// kicking users, moving messages, etc.

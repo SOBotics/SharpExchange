@@ -103,5 +103,24 @@ namespace SharpExchange.Auth
 
 			cache[host] = authCookies;
 		}
+
+		/// <summary>
+		/// Log in to the given room. 
+		/// Automatically called when cookies are requested that aren't in the cache yet.
+		/// </summary>
+		/// <returns>Whether or not the login was successful.</returns>
+		public bool Login(string url)
+		{
+			try
+			{
+				this.FetchCookies(url);
+				return true;
+			}
+
+			catch (InvalidCredentialsException)
+			{
+				return false;
+			}
+		}
 	}
 }
