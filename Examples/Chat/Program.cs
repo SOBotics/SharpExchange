@@ -32,6 +32,9 @@ public class Program
 		// Fetch your account's credentials from somewhere.
 		var auth = new EmailAuthenticationProvider("", "");
 
+		// Log in to the community to authenticate with chat.
+		_ = auth.Login("stackexchange.com");
+
 		// Create an instance of the ActionScheduler. This will
 		// allow us to execute chat actions like: posting messages,
 		// kicking users, moving messages, etc.
