@@ -14,11 +14,13 @@ namespace SharpExchange.Chat.Events.Message
 
 	public class MessageStarToggled : ChatEventDataProcessor, IChatEventHandler<MessageStars>
 	{
-		public override EventType Event => EventType.MessageStarToggled;
+		private EventType[] eventType = new[] { EventType.MessageStarToggled };
+
+		public override EventType[] Events => eventType;
 
 		public event Action<MessageStars> OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var stars = data.Value<int?>("message_stars");

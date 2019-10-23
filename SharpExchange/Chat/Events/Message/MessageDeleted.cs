@@ -11,11 +11,13 @@ namespace SharpExchange.Chat.Events.Message
 
 	public class MessageDeleted : ChatEventDataProcessor, IChatEventHandler<DeletedMessage>
 	{
-		public override EventType Event => EventType.MessageDeleted;
+		private EventType[] eventType = new[] { EventType.MessageDeleted };
+
+		public override EventType[] Events => eventType;
 
 		public event Action<DeletedMessage> OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var deletedBy = data.Value<int>("user_id");

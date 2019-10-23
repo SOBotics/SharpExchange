@@ -5,11 +5,13 @@ namespace SharpExchange.Chat.Events.Message
 {
 	public class MessageMovedOut : ChatEventDataProcessor, IChatEventHandler<MovedMessage>
 	{
-		public override EventType Event => EventType.MessageMovedOut;
+		private EventType[] eventType = new[] { EventType.MessageMovedOut };
+
+		public override EventType[] Events => eventType;
 
 		public event Action<MovedMessage> OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var movedBy = data.Value<int>("user_id");

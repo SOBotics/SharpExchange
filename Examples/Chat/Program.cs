@@ -9,15 +9,17 @@ using System.Threading.Tasks;
 
 public class AllData : ChatEventDataProcessor, IChatEventHandler<string>
 {
-	// The type of event we want to process.
-	public override EventType Event => EventType.All;
+	// The type of events we want to process.
+	private EventType[] events = new[] { EventType.All };
+
+	public override EventType[] Events => events;
 
 	public event Action<string> OnEvent;
 
 	// Process the incoming JSON data coming from the RoomWatcher's
 	// WebSocket. In this example, we just stringify the object and
 	// invoke any listeners.
-	public override void ProcessEventData(JToken data) => OnEvent?.Invoke(data.ToString());
+	public override void ProcessEventData(EventType _, JToken data) => OnEvent?.Invoke(data.ToString());
 }
 
 public class Program
@@ -39,12 +41,17 @@ public class Program
 		// allow us to execute chat actions like: posting messages,
 		// kicking users, moving messages, etc.
 		using var actionScheduler = new ActionScheduler(auth, roomUrl);
+
 		// Create an instance of the RoomWatcher class. Here we
 		// specify (via the type parameter) what WebSocket implementation
 		// we'd like to use. This class allows you to subscribe to chat events.
 		using var roomWatcher = new RoomWatcher<DefaultWebSocket>(auth, roomUrl);
+
 		// Subscribe to the UserMentioned event.
-		_ = roomWatcher.AddUserMentionedEventHandler(async m => await actionScheduler.CreateReplyAsync("hello!", m.MessageId));
+		_ = roomWatcher.AddUserMentionedEventHandler(async m =>
+		{
+			await actionScheduler.CreateReplyAsync("hello!", m.MessageId);
+		});
 
 		// Besides being able to subscribe to the default events,
 		// you can also create (and listen to) your own. Your class must

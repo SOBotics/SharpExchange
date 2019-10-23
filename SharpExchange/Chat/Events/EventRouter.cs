@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
+using System.Linq;
 using System.Threading.Tasks;
 using Newtonsoft.Json.Linq;
 using SharpExchange.Net.WebSockets;
@@ -58,6 +59,7 @@ namespace SharpExchange.Chat.Events
 		public void AddProcessor(ChatEventDataProcessor p)
 		{
 			p.ThrowIfNull(nameof(p));
+			p.Events.ThrowIfNullOrEmpty(nameof(p.Events));
 
 			p.RoomId = RoomId;
 
@@ -88,18 +90,18 @@ namespace SharpExchange.Chat.Events
 
 			if (roomEvents == null) return;
 
-			foreach (var ev in roomEvents)
+			foreach (var eventData in roomEvents)
 			{
-				var eventType = ev.Value<int>("event_type");
+				var eventType = (EventType)eventData.Value<int>("event_type");
 
 				foreach (var processor in EventProcessors)
 				{
-					if (processor.Event != EventType.All && processor.Event != (EventType)eventType)
+					if (processor.Events[0] != EventType.All && !processor.Events.Any(x => x == eventType))
 					{
 						continue;
 					}
 
-					_ = Task.Run(() => processor.ProcessEventData(ev));
+					_ = Task.Run(() => processor.ProcessEventData(eventType, eventData));
 				}
 			}
 		}

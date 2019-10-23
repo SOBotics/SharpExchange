@@ -11,11 +11,13 @@ namespace SharpExchange.Chat.Events.User
 
 	public class UserMentioned : ChatEventDataProcessor, IChatEventHandler<MentionedUser>
 	{
-		public override EventType Event => EventType.UserMentioned;
+		private EventType[] eventType = new[] { EventType.UserMentioned };
+
+		public override EventType[] Events => eventType;
 
 		public event Action<MentionedUser> OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			var roomOrigin = data.Value<int>("room_id");
 

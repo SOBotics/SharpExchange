@@ -12,11 +12,13 @@ namespace SharpExchange.Chat.Events.Message
 
 	public class MessageReplyCreated : ChatEventDataProcessor, IChatEventHandler<MessageReply>
 	{
-		public override EventType Event => EventType.MessageReply;
+		private EventType[] eventType = new[] { EventType.MessageReply };
+
+		public override EventType[] Events => eventType;
 
 		public event Action<MessageReply> OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			var msgId = data.Value<int>("message_id");
 			var targetMsgId = data.Value<int>("parent_id");

@@ -12,11 +12,13 @@ namespace SharpExchange.Chat.Events.User
 
 	public class UserInvitedToRoom : ChatEventDataProcessor, IChatEventHandler<RoomInvite>
 	{
-		public override EventType Event => EventType.RoomInvitation;
+		private EventType[] eventType = new[] { EventType.RoomInvitation };
+
+		public override EventType[] Events => eventType;
 
 		public event Action<RoomInvite> OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			var inviter = data.Value<int>("user_id");
 			var invitee = data.Value<int>("target_user_id");

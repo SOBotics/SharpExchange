@@ -12,11 +12,13 @@ namespace SharpExchange.Chat.Events.User
 
 	public class UserAccessLevelChanged : ChatEventDataProcessor, IChatEventHandler<ChangedUserAccessLevel>
 	{
-		public override EventType Event => EventType.UserAccessLevelChanged;
+		private EventType[] eventType = new[] { EventType.UserAccessLevelChanged };
+
+		public override EventType[] Events => eventType;
 
 		public event Action<ChangedUserAccessLevel> OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			var userId = data.Value<int>("user_id");
 			var targetUserId = data.Value<int>("target_user_id");

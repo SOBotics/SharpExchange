@@ -2,9 +2,6 @@
 {
 	public enum EventType
 	{
-		/// <summary>
-		/// SUBSCRIBE TO ALL DEH EVENTZ!!!11!
-		/// </summary>
 		All = -1,
 
 		/// <summary>

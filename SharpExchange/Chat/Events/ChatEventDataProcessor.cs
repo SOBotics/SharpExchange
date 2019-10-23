@@ -6,8 +6,8 @@ namespace SharpExchange.Chat.Events
 	{
 		public int RoomId { get; internal set; }
 
-		public abstract EventType Event { get; }
+		public abstract EventType[] Events { get; }
 
-		public abstract void ProcessEventData(JToken data);
+		public abstract void ProcessEventData(EventType eventType, JToken data);
 	}
 }

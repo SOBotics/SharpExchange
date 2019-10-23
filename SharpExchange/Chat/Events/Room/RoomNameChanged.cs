@@ -5,11 +5,13 @@ namespace SharpExchange.Chat.Events.Room
 {
 	public class RoomNameChanged : ChatEventDataProcessor, IChatEventHandler
 	{
-		public override EventType Event => EventType.RoomNameChanged;
+		private EventType[] eventType = new[] { EventType.RoomNameChanged  };
+
+		public override EventType[] Events => eventType;
 
 		public event Action OnEvent;
 
-		public override void ProcessEventData(JToken data)
+		public override void ProcessEventData(EventType _, JToken data)
 		{
 			OnEvent?.Invoke();
 		}
